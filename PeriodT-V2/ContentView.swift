@@ -7,18 +7,56 @@
 
 import SwiftUI
 
+/// Temporary screen that proves programs load from Supabase.
 struct ContentView: View {
+    let repository: IPeriodTRepository
+
+    @State private var programs: [ExerciseProgram] = []
+    @State private var errorMessage: String?
+    @State private var isAddingProgram = false
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("TEST THE GIT!")
+        NavigationStack {
+            List(programs) { program in
+                Section("\(program.formattedDate) · \(program.exerciseType.title)") {
+                    ForEach(program.workouts) { workout in
+                        HStack {
+                            Text(workout.name)
+                            Spacer()
+                            if let sets = workout.sets {
+                                Text("\(sets) sets").foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+            .overlay {
+                if let errorMessage {
+                    ContentUnavailableView("Couldn't load programs", systemImage: "wifi.exclamationmark", description: Text(errorMessage))
+                }
+            }
+            .navigationTitle("Programs")
+            .toolbar {
+                Button("Add Program", systemImage: "plus") { isAddingProgram = true }
+            }
+            .sheet(isPresented: $isAddingProgram) {
+                AddProgramView(repository: repository, onSaved: load)
+            }
+            .task { await load() }
+            .refreshable { await load() }
         }
-        .padding()
+    }
+
+    private func load() async {
+        do {
+            programs = try await repository.fetchWorkouts()
+            errorMessage = nil
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 }
 
 #Preview {
-    ContentView()
+    ContentView(repository: PeriodTRepository(projectURL: URL(string: "https://mizilxflvxuldksvcvhz.supabase.co")!, publishableKey: "sb_publishable_D12Dbrz6AttqLF-p73xJcA_3Jov0JJx"))
 }

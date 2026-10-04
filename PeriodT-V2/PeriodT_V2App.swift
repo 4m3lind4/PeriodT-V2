@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct PeriodT_V2App: App {
+    
+    private let repository: IPeriodTRepository = PeriodTRepository(projectURL: URL(string: "https://mizilxflvxuldksvcvhz.supabase.co")!, publishableKey: "sb_publishable_D12Dbrz6AttqLF-p73xJcA_3Jov0JJx")
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(repository: repository)
         }
     }
 }
