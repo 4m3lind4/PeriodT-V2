@@ -21,6 +21,7 @@ struct ContentView: View {
                 Section("\(program.formattedDate) · \(program.exerciseType.title)") {
                     ForEach(program.workouts) { workout in
                         HStack {
+                            ExerciseThumbnail(url: workout.imageURL)
                             Text(workout.name)
                             Spacer()
                             if let sets = workout.sets {
