@@ -59,5 +59,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView(repository: PeriodTRepository(projectURL: URL(string: "https://mizilxflvxuldksvcvhz.supabase.co")!, publishableKey: "sb_publishable_D12Dbrz6AttqLF-p73xJcA_3Jov0JJx"))
+    ContentView(repository: MockPeriodTRepository())
 }

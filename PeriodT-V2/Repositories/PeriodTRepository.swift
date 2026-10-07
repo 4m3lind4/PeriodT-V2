@@ -39,7 +39,7 @@ struct PeriodTRepository: IPeriodTRepository {
             .execute()
         
         let workoutRows = program.workouts.enumerated().map { index, workout in
-            WorkoutRow(workout, programID: program.id, position: index)
+            WorkoutRowModel(workout, programID: program.id, position: index)
         }
         guard !workoutRows.isEmpty else { return }
         
@@ -88,7 +88,7 @@ private struct ProgramRow: Encodable {
 }
 
 /// The columns of `workouts`, including which program it belongs to and its order.
-private struct WorkoutRow: Encodable {
+private struct WorkoutRowModel: Encodable {
     let id: UUID
     let programID: UUID
     let name: String

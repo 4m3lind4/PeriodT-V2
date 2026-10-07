@@ -14,7 +14,7 @@ struct PeriodT_V2App: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView(repository: repository)
+            PeriodTExercises(repository: repository)
         }
     }
 }

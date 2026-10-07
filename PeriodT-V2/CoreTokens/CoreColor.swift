@@ -31,4 +31,15 @@ public final class CoreColor {
     static var white: Color = Color(hex: "#FFFFFF")
     
     static var yellow: Color = Color(hex: "#FAD72C")
+    
+    // MARK: Active Colours
+    static let completed      = Color(hex: "#F08054") // Completed
+    
+    static let current        = Color(hex: "#DB6E96") // Current
+    
+    static let incoming       = Color(hex: "#AB7AC7") // Incoming
+    
+    static let physioAccent   = Color(hex: "#FAD94A") // Physio
+    
+    static let cardBackground = Color(hex: "#FCEBF0") // light pink
 }

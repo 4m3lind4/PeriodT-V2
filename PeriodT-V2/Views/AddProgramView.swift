@@ -120,3 +120,7 @@ struct AddProgramView: View {
         sets.map { "\($0) sets" } ?? "No sets"
     }
 }
+
+#Preview {
+    AddProgramView(repository: MockPeriodTRepository(delay: .seconds(1)), onSaved: {})
+}
