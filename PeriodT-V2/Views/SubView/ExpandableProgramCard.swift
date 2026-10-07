@@ -32,15 +32,17 @@ struct ExpandableProgramCard: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
-        .background(CoreColor.ringBackground.opacity(isExpanded ? 0.6 : 0))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
         .animation(.snappy(duration: 0.3), value: isExpanded)
     }
+
+    private let stripeWidth: CGFloat = 18
+    private let physioWidth: CGFloat = 6
+    private var isPhysio: Bool { program.exerciseType == .physio }
 
     private var header: some View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(program.formattedDate)
+                Text(program.formattedDate.uppercased())
                 Text("Day \(program.day)")
                 Text("\(program.numberOfExercises) Exercises - \(program.exerciseDuration) Mins")
             }
@@ -53,8 +55,11 @@ struct ExpandableProgramCard: View {
                 .rotationEffect(.degrees(isExpanded ? 180 : 0))
         }
         .padding(16)
-        .foregroundStyle(.white)
-        .background(program.color)
+        .padding(.leading, stripeWidth + (isPhysio ? physioWidth : 0))
+        .foregroundStyle(CoreColor.primary)
+        // Stripe sits in the background so it always matches the text height.
+        .background(alignment: .leading) { statusStripe }
+        .background(CoreColor.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .contentShape(Rectangle())
         .onTapGesture {
@@ -63,18 +68,42 @@ struct ExpandableProgramCard: View {
         }
     }
 
-    private var workoutList: some View {
-        VStack(spacing: 12) {
-            ForEach(program.workouts) { workout in
-                WorkoutRow(workout: workout)
+    /// Left edge: status colour, plus a yellow strip for physio programs.
+    private var statusStripe: some View {
+        HStack(spacing: 0) {
+            program.status.color.frame(width: stripeWidth)
+            if isPhysio {
+                CoreColor.physioAccent.frame(width: physioWidth)
             }
+        }
+    }
+
+    /// Inset pink panel of workouts, with the Start button underneath it.
+    private var workoutList: some View {
+        VStack(spacing: 16) {
+            VStack(spacing: 12) {
+                ForEach(program.workouts) { workout in
+                    WorkoutRow(workout: workout)
+
+                    if workout.id != program.workouts.last?.id {
+                        Rectangle()
+                            .fill(CoreColor.primary)
+                            .frame(height: 1.5)
+                            .padding(.horizontal, 40)
+                    }
+                }
+            }
+            .padding(12)
+            .background(CoreColor.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .padding(.horizontal, 16)
+
             // Pushes onto the NavigationStack owned by PeriodTExercises.
             NavigationLink(value: program) {
                 PrimaryButtonLabel(title: "Start", style: .filled)
             }
-            .padding(.top, 8)
         }
-        .padding(12)
+        .padding(.top, 8)
     }
 }
 

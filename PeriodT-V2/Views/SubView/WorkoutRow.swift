@@ -14,29 +14,34 @@
 //
 import SwiftUI
 
+/// One exercise in an expanded program: thumbnail, name, then sets on the right.
 struct WorkoutRow: View {
     let workout: Workout
 
     var body: some View {
-        VStack(spacing: 4) {
+        HStack(spacing: 16) {
+            ExerciseThumbnail(url: ExerciseImageCatalog.imageURL(for: workout.name), size: 76)
+
             Text(workout.name)
                 .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
             if let sets = workout.sets {
-                Text("\(sets) Sets")
-                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                Text("\(sets) sets")
+                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                    .fixedSize()
             }
         }
         .foregroundStyle(CoreColor.primary)
-        .multilineTextAlignment(.center)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 22)
-        .padding(.horizontal, 16)
-        .background(CoreColor.ringBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .shadow(color: .black.opacity(0.12), radius: 0, y: 3)
     }
 }
 
 #Preview {
-    WorkoutRow(workout: Workout(name: "run"))
+    VStack {
+        WorkoutRow(workout: Workout(name: "Lunge with scooter - rowing machine", sets: 3))
+        WorkoutRow(workout: Workout(name: "Plank"))
+    }
+    .padding()
+    .background(CoreColor.cardBackground)
 }

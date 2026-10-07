@@ -53,6 +53,11 @@ extension MockPeriodTRepository {
     /// Dates are relative to today, so there's always a mix of past (lavender) and upcoming (pink) programs.
     /// Workout names match `ExerciseImages.csv`, so thumbnails show up.
     static let samplePrograms: [ExerciseProgram] = [
+        sampleProgram(daysFromToday: -5, day: 0, duration: 35, type: .conditioningTraining, workouts: [
+            ("Goblet Squat", 3),
+            ("Push-up", 3),
+            ("Walking", nil)
+        ]),
         sampleProgram(daysFromToday: -3, day: 1, duration: 30, type: .physio, workouts: [
             ("Glute Bridge", 3),
             ("Bird Dog", 3),
@@ -79,6 +84,11 @@ extension MockPeriodTRepository {
             ("Pallof Press", 3),
             ("Step-Up", 3),
             ("Walking", nil)
+        ]),
+        sampleProgram(daysFromToday: 7, day: 6, duration: 45, type: .conditioningTraining, workouts: [
+            ("Kettlebell Swing", 3),
+            ("Dumbbell Row", 3),
+            ("Plank", nil)
         ])
     ]
 

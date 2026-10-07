@@ -37,17 +37,6 @@ struct ExerciseProgram: Identifiable, Hashable, Codable {
     var formattedDate: String {
         date.formattedProgramDate()
     }
-    
-    /// Upcoming programs are pink, past ones fade to lavender.
-    /// Compares whole dates, not day-of-month, so month boundaries work.
-    var color: Color {
-        if date.startOfDay >= Date().startOfDay {
-            CoreColor.primary
-        } else {
-            CoreColor.lavender
-        }
-    }
-    
     private static let dateNumberFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "d"
@@ -59,6 +48,9 @@ struct ExerciseProgram: Identifiable, Hashable, Codable {
     /// Day-of-month as an Int (e.g. 14 for the 14th).
     func dateNumber(date: Date) -> Int {
         Int(Self.dateNumberFormatter.string(from: date)) ?? 0
+        
     }
+    
+    
 }
 
