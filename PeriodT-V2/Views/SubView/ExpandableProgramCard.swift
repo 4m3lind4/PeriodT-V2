@@ -32,6 +32,10 @@ struct ExpandableProgramCard: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
+        // When open, the header sits on a pale tray that holds the workouts and Start.
+        .background(CoreColor.cardTray.opacity(isExpanded ? 1 : 0))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: .black.opacity(isExpanded ? 0.06 : 0), radius: 8, y: 2)
         .animation(.snappy(duration: 0.3), value: isExpanded)
     }
 
@@ -61,6 +65,8 @@ struct ExpandableProgramCard: View {
         .background(alignment: .leading) { statusStripe }
         .background(CoreColor.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        // Lifts the header off the tray when open.
+        .shadow(color: .black.opacity(isExpanded ? 0.12 : 0), radius: 6, y: 3)
         .contentShape(Rectangle())
         .onTapGesture {
             // Tapping an open card closes it; tapping another swaps to it.
@@ -78,32 +84,36 @@ struct ExpandableProgramCard: View {
         }
     }
 
-    /// Inset pink panel of workouts, with the Start button underneath it.
-    private var workoutList: some View {
-        VStack(spacing: 16) {
-            VStack(spacing: 12) {
-                ForEach(program.workouts) { workout in
-                    WorkoutRow(workout: workout)
+    private let thumbnailSize: CGFloat = 76
+    private let rowSpacing: CGFloat = 16
 
-                    if workout.id != program.workouts.last?.id {
-                        Rectangle()
-                            .fill(CoreColor.primary)
-                            .frame(height: 1.5)
-                            .padding(.horizontal, 40)
-                    }
+    /// Workouts lined up with the header text, divided by faint lines, then Start.
+    private var workoutList: some View {
+        VStack(spacing: 0) {
+            ForEach(program.workouts) { workout in
+                WorkoutRow(workout: workout, thumbnailSize: thumbnailSize, spacing: rowSpacing)
+                    .padding(.vertical, 14)
+
+                if workout.id != program.workouts.last?.id {
+                    // Starts where the thumbnail ends, as in the design.
+                    Rectangle()
+                        .fill(CoreColor.primary.opacity(0.3))
+                        .frame(height: 1)
+                        .padding(.leading, thumbnailSize)
                 }
             }
-            .padding(12)
-            .background(CoreColor.cardBackground)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .padding(.horizontal, 16)
 
             // Pushes onto the NavigationStack owned by PeriodTExercises.
             NavigationLink(value: program) {
                 PrimaryButtonLabel(title: "Start", style: .filled)
             }
+            .padding(.top, 12)
         }
+        // Indent matches the header text, which sits past the status stripe.
+        .padding(.leading, stripeWidth + (isPhysio ? physioWidth : 0) + 16)
+        .padding(.trailing, 24)
         .padding(.top, 8)
+        .padding(.bottom, 16)
     }
 }
 

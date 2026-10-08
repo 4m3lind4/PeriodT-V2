@@ -17,10 +17,12 @@ import SwiftUI
 /// One exercise in an expanded program: thumbnail, name, then sets on the right.
 struct WorkoutRow: View {
     let workout: Workout
+    var thumbnailSize: CGFloat = 76
+    var spacing: CGFloat = 16
 
     var body: some View {
-        HStack(spacing: 16) {
-            ExerciseThumbnail(url: ExerciseImageCatalog.imageURL(for: workout.name), size: 76)
+        HStack(spacing: spacing) {
+            ExerciseThumbnail(url: ExerciseImageCatalog.imageURL(for: workout.name), size: thumbnailSize)
 
             Text(workout.name)
                 .font(.system(size: 16, weight: .semibold, design: .rounded))
@@ -30,6 +32,7 @@ struct WorkoutRow: View {
             if let sets = workout.sets {
                 Text("\(sets) sets")
                     .font(.system(size: 16, weight: .medium, design: .rounded))
+                    .foregroundStyle(CoreColor.primary.opacity(0.75))
                     .fixedSize()
             }
         }
@@ -43,5 +46,5 @@ struct WorkoutRow: View {
         WorkoutRow(workout: Workout(name: "Plank"))
     }
     .padding()
-    .background(CoreColor.cardBackground)
+    .background(CoreColor.cardTray)
 }

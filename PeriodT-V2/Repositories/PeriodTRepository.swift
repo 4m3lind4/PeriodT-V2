@@ -17,12 +17,13 @@ struct PeriodTRepository: IPeriodTRepository {
     }
     
     /// Fetches shared programs plus the user's own, each with its workouts nested inside, soonest first.
+    /// Each workout carries the current user's completion row (if any), so ticks survive relaunches.
     func fetchWorkouts() async throws -> [ExerciseProgram] {
         // If sign-in fails, still show the shared programs rather than an error.
         try? await signInIfNeeded()
         return try await client
             .from("exercise_programs")
-            .select("*, workouts(*)")
+            .select("*, workouts(*, workout_completions(completed_at))")
             .order("date")
             .order("position", referencedTable: "workouts")
             .execute()
@@ -49,6 +50,33 @@ struct PeriodTRepository: IPeriodTRepository {
             .execute()
     }
     
+    /// Adds rows for newly ticked workouts and removes rows for unticked ones.
+    /// `user_id` is filled by the database, and RLS limits the delete to this user's rows.
+    func saveCompletedWorkouts(_ completedIDs: Set<Workout.ID>, in program: ExerciseProgram) async throws {
+        try await signInIfNeeded()
+
+        let ticked = program.workouts.filter { completedIDs.contains($0.id) }
+        let unticked = program.workouts.filter { !completedIDs.contains($0.id) }
+
+        if !ticked.isEmpty {
+            // ignoreDuplicates keeps the original completed_at for already-ticked workouts.
+            try await client
+                .from("workout_completions")
+                .upsert(ticked.map { CompletionRow(workoutID: $0.id) },
+                        onConflict: "user_id,workout_id",
+                        ignoreDuplicates: true)
+                .execute()
+        }
+
+        if !unticked.isEmpty {
+            try await client
+                .from("workout_completions")
+                .delete()
+                .in("workout_id", values: unticked.map(\.id))
+                .execute()
+        }
+    }
+
     /// Gives this device its own Supabase user the first time, with no login screen.
     /// The session is saved in the Keychain, so later launches reuse the same user.
     private func signInIfNeeded() async throws {
@@ -106,5 +134,14 @@ private struct WorkoutRowModel: Encodable {
     enum CodingKeys: String, CodingKey {
         case id, name, sets, position
         case programID = "program_id"
+    }
+}
+
+/// A row in `workout_completions`. `user_id` and `completed_at` are filled by the database.
+private struct CompletionRow: Encodable {
+    let workoutID: UUID
+
+    enum CodingKeys: String, CodingKey {
+        case workoutID = "workout_id"
     }
 }

@@ -37,6 +37,24 @@ final class MockPeriodTRepository: IPeriodTRepository {
         programs.append(program)
     }
 
+    func saveCompletedWorkouts(_ completedIDs: Set<Workout.ID>, in program: ExerciseProgram) async throws {
+        try await simulateNetwork()
+        guard let index = programs.firstIndex(where: { $0.id == program.id }) else { return }
+        let updated = programs[index].workouts.map { workout in
+            var workout = workout
+            workout.isCompleted = completedIDs.contains(workout.id)
+            return workout
+        }
+        let old = programs[index]
+        programs[index] = ExerciseProgram(id: old.id,
+                                          date: old.date,
+                                          day: old.day,
+                                          exerciseDuration: old.exerciseDuration,
+                                          numberOfExercises: old.numberOfExercises,
+                                          exerciseType: old.exerciseType,
+                                          workouts: updated)
+    }
+
     private func simulateNetwork() async throws {
         if delay > .zero {
             try await Task.sleep(for: delay)

@@ -19,6 +19,7 @@ import SwiftUI
 /// with one card expandable at a time. Physio programs are marked on the card itself.
 struct PeriodTExercises: View {
     let repository: IPeriodTRepository
+    @EnvironmentObject private var navigation: AppNavigationViewModel
     @State var exerciseData: [ExerciseProgram] = []
     @State private var errorMessage: String?
 
@@ -43,6 +44,24 @@ struct PeriodTExercises: View {
     }
 
     var body: some View {
+        // Bound to the shared path so deeper screens can push/pop by editing it.
+        NavigationStack(path: $navigation.exercisePath) {
+            programList
+                // "Start" on a card pushes the program it was showing.
+                .navigationDestination(for: ExerciseProgram.self) { program in
+                    ActiveInProgramView(program: program, repository: repository)
+                }
+                // Pushed by ActiveInProgramView after a successful submit.
+                .navigationDestination(for: ExerciseFlow.self) { step in
+                    switch step {
+                    case .completed:
+                        ProgramCompletedView()
+                    }
+                }
+        }
+    }
+
+    private var programList: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 ScreenHeader(title: "Today's Program")
@@ -64,6 +83,10 @@ struct PeriodTExercises: View {
         .contentMargins(.bottom, 100, for: .scrollContent)
         .task { await load() }
         .refreshable { await load() }
+        // Back on the list after a submit: refetch so saved ticks are reflected.
+        .onChange(of: navigation.exercisePath.isEmpty) { _, isEmpty in
+            if isEmpty { Task { await load() } }
+        }
     }
 
     /// Section heading, the first few cards, and a View More / View Less toggle.
@@ -112,4 +135,6 @@ struct PeriodTExercises: View {
 
 #Preview {
     PeriodTExercises(repository: MockPeriodTRepository())
+        .errorCardHost()
+        .environmentObject(AppNavigationViewModel())
 }

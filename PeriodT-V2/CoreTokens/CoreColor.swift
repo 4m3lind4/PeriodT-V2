@@ -42,4 +42,6 @@ public final class CoreColor {
     static let physioAccent   = Color(hex: "#FAD94A") // Physio
     
     static let cardBackground = Color(hex: "#FCEBF0") // light pink
+
+    static let cardTray       = Color(hex: "#FDF7F9") // expanded card body
 }
