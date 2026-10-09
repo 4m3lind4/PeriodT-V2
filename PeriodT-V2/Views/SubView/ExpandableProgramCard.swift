@@ -5,14 +5,6 @@
 //  Created by Jessica Amelinda Mang on 5/10/2026.
 //
 
-
-//
-//  ExpandableProgramCard.swift
-//  PeriodT
-//
-//  Created by Jessica Amelinda Mang on 14/9/2026.
-//
-
 import SwiftUI
 
 /// Program summary card that expands to reveal its workouts and a Start button.

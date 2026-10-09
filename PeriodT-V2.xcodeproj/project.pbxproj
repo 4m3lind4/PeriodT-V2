@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		7F944EA93071539100DC27BE /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 7F944EA83071539100DC27BE /* Supabase */; };
+		7F944F03307849D200DC27BE /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 7F944F02307849D200DC27BE /* Lottie */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7F944EA93071539100DC27BE /* Supabase in Frameworks */,
+				7F944F03307849D200DC27BE /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -126,6 +128,7 @@
 			name = "PeriodT-V2";
 			packageProductDependencies = (
 				7F944EA83071539100DC27BE /* Supabase */,
+				7F944F02307849D200DC27BE /* Lottie */,
 			);
 			productName = "PeriodT-V2";
 			productReference = 7F944D28306E0E0600DC27BE /* PeriodT-V2.app */;
@@ -211,6 +214,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				7F944EA63071535500DC27BE /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				7F944EFD3077806200DC27BE /* XCRemoteSwiftPackageReference "lottie-spm" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7F944D29306E0E0600DC27BE /* Products */;
@@ -604,6 +608,16 @@
 				kind = upToNextMajorVersion;
 				minimumVersion = 2.5.1;
 			};
+			traits = (
+			);
+		};
+		7F944EFD3077806200DC27BE /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.6.1;
+			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
@@ -612,6 +626,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7F944EA63071535500DC27BE /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
+		};
+		7F944F02307849D200DC27BE /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7F944EFD3077806200DC27BE /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

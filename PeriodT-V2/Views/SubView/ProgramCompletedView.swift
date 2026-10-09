@@ -11,35 +11,49 @@ import SwiftUI
 struct ProgramCompletedView: View {
     @EnvironmentObject private var navigation: AppNavigationViewModel
 
+    @State private var informCoach: ReviewAnswer?
+    @State private var showCelebration = false
+
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
+        ZStack{
+            CoreColor.primary
+                .ignoresSafeArea()
+            ScrollView {
+            VStack(alignment: .leading, spacing: 16){
+                Text("Great Job!")
+                    .font(Font.system(size: 30, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                PostWorkoutIntensity()
+                WorkoutJournalView()
 
-            Image(systemName: "checkmark.seal.fill")
-                .font(.system(size: 96))
-                .foregroundStyle(CoreColor.primary)
+                QuestionCardView(
+                    selectedAnswer: $informCoach,
+                    question: "Would you like to inform your coach about your set?",
+                    color: CoreColor.accent
+                )
+                .padding(.horizontal, 8)
 
-            Text("Great Job!")
-                .font(.system(size: 36, weight: .bold, design: .rounded))
-                .foregroundStyle(CoreColor.primary)
-
-            Text("Your program has been saved.")
-                .font(.system(size: 18, weight: .medium, design: .rounded))
-                .foregroundStyle(CoreColor.primary.opacity(0.7))
-
-            Spacer()
-
-            // Clears the whole exercise stack, landing back on the program list.
-            Button {
-                navigation.returnHome()
-            } label: {
-                PrimaryButtonLabel(title: "Done", style: .filled)
+                Button {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        showCelebration = true
+                    }
+                } label: {
+                    PrimaryButtonLabel(title: "Submit")
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, 8)
             }
-            .padding(.bottom, 40)
+            .padding(10)
+            }
+
+            if showCelebration {
+                WorkoutCelebrationView {
+                    navigation.returnHome()
+                }
+                .zIndex(1)
+            }
         }
-        .frame(maxWidth: .infinity)
-        // Back would return to the already-submitted checklist, so hide it.
-        .navigationBarBackButtonHidden()
+        .toolbar(showCelebration ? .hidden : .visible, for: .navigationBar)
     }
 }
 
