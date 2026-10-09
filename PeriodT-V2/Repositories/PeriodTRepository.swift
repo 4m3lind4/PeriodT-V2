@@ -140,6 +140,8 @@ private struct WorkoutRowModel: Encodable {
     let programID: UUID
     let name: String
     let sets: Int?
+    let reps: Int?
+    let restSeconds: Int?
     let position: Int
     
     init(_ workout: Workout, programID: UUID, position: Int) {
@@ -147,11 +149,14 @@ private struct WorkoutRowModel: Encodable {
         self.programID = programID
         name = workout.name
         sets = workout.sets
+        reps = workout.reps
+        restSeconds = workout.restSeconds
         self.position = position
     }
     
     enum CodingKeys: String, CodingKey {
-        case id, name, sets, position
+        case id, name, sets, reps, position
+        case restSeconds = "rest_seconds"
         case programID = "program_id"
     }
 }

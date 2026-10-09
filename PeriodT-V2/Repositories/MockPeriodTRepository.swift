@@ -170,7 +170,7 @@ extension MockPeriodTRepository {
             exerciseDuration: duration,
             numberOfExercises: workouts.count,
             exerciseType: type,
-            workouts: workouts.map { Workout(name: $0.name, sets: $0.sets) }
+            workouts: workouts.map { Workout(name: $0.name, sets: $0.sets, reps: $0.sets == nil ? nil : 10, restSeconds: 10) }
         )
     }
 }
