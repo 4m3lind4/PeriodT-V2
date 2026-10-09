@@ -14,6 +14,7 @@
 //
 
 import SwiftUI
+import Lottie
 
 /// Exercise tab: lists programs grouped into today, incoming and completed,
 /// with one card expandable at a time. Physio programs are marked on the card itself.
@@ -22,6 +23,8 @@ struct PeriodTExercises: View {
     @EnvironmentObject private var navigation: AppNavigationViewModel
     @State var exerciseData: [ExerciseProgram] = []
     @State private var errorMessage: String?
+    /// False until the first fetch finishes; drives the loading animation.
+    @State private var hasLoaded = false
 
     // Only one card is open at once; shared across all sections.
     @State private var expandedProgramID: ExerciseProgram.ID?
@@ -81,6 +84,17 @@ struct PeriodTExercises: View {
         }
         // Keeps the last card clear of the floating tab bar.
         .contentMargins(.bottom, 100, for: .scrollContent)
+        // Only on the very first fetch, so pull-to-refresh doesn't flash it.
+        .overlay {
+            if !hasLoaded {
+                ZStack {
+                    Color(.systemBackground).ignoresSafeArea()
+                    LottieView(animationName: "Loading", loopMode: .loop)
+                        .frame(width: 200, height: 200)
+                }
+                .transition(.opacity)
+            }
+        }
         .task { await load() }
         .refreshable { await load() }
         // Back on the list after a submit: refetch so saved ticks are reflected.
@@ -130,6 +144,7 @@ struct PeriodTExercises: View {
         } catch {
             errorMessage = error.localizedDescription
         }
+        withAnimation { hasLoaded = true }
     }
 }
 

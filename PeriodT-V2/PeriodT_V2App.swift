@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct PeriodT_V2App: App {
@@ -17,9 +18,12 @@ struct PeriodT_V2App: App {
 
     var body: some Scene {
         WindowGroup {
-            PeriodTExercises(repository: repository)
+            ContentView(repository: repository)
+                // App-wide errors sit above the tab bar.
                 .errorCardHost()
                 .environmentObject(navigation)
         }
+        // Calendar and Home polls read/write these via SwiftData.
+        .modelContainer(for: [PollAnswers.self, CompletedProgram.self])
     }
 }

@@ -6,58 +6,52 @@
 //
 
 import SwiftUI
+import SwiftData
 
-/// Temporary screen that proves programs load from Supabase.
+/// Root of the app: a three-tab layout (Home, Calendar, Exercise).
+/// Tab selection and the exercise navigation stack live in `AppNavigationViewModel`
+/// so deep screens (e.g. the completed-program page) can jump back home.
 struct ContentView: View {
     let repository: IPeriodTRepository
 
-    @State private var programs: [ExerciseProgram] = []
-    @State private var errorMessage: String?
-    @State private var isAddingProgram = false
+    @EnvironmentObject private var navigation: AppNavigationViewModel
 
     var body: some View {
-        NavigationStack {
-            List(programs) { program in
-                Section("\(program.formattedDate) · \(program.exerciseType.title)") {
-                    ForEach(program.workouts) { workout in
-                        HStack {
-                            ExerciseThumbnail(url: workout.imageURL)
-                            Text(workout.name)
-                            Spacer()
-                            if let sets = workout.sets {
-                                Text("\(sets) sets").foregroundStyle(.secondary)
-                            }
-                        }
-                    }
+        TabView(selection: $navigation.selectedTab) {
+            // Placeholder Home until a dedicated home screen is ported.
+            ScrollView {
+                HomeQuestionaireView()
+                    .padding()
+            }
+                .errorCardHost()
+                .tabItem {
+                    Image(systemName: "clock")
+                    Text("Home")
                 }
-            }
-            .overlay {
-                if let errorMessage {
-                    ContentUnavailableView("Couldn't load programs", systemImage: "wifi.exclamationmark", description: Text(errorMessage))
-                }
-            }
-            .navigationTitle("Programs")
-            .toolbar {
-                Button("Add Program", systemImage: "plus") { isAddingProgram = true }
-            }
-            .sheet(isPresented: $isAddingProgram) {
-                AddProgramView(repository: repository, onSaved: load)
-            }
-            .task { await load() }
-            .refreshable { await load() }
-        }
-    }
+                .tag(AppNavigationViewModel.Tab.home)
 
-    private func load() async {
-        do {
-            programs = try await repository.fetchWorkouts()
-            errorMessage = nil
-        } catch {
-            errorMessage = error.localizedDescription
+            PeriodTTracking()
+                .tabItem {
+                    Image(systemName: "calendar")
+                    Text("Calendar")
+                }
+                .tag(AppNavigationViewModel.Tab.calendar)
+
+            // PeriodTExercises owns its NavigationStack (bound to navigation.exercisePath).
+            PeriodTExercises(repository: repository)
+                .errorCardHost()
+                .tabItem {
+                    Image(systemName: "figure.flexibility")
+                    Text("Exercise")
+                }
+                .tag(AppNavigationViewModel.Tab.exercise)
         }
+        .tint(CoreColor.primary)
     }
 }
 
 #Preview {
     ContentView(repository: MockPeriodTRepository())
+        .environmentObject(AppNavigationViewModel())
+        .modelContainer(for: [PollAnswers.self, CompletedProgram.self], inMemory: true)
 }
