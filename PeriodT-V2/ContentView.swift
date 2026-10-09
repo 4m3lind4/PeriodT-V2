@@ -17,6 +17,23 @@ struct ContentView: View {
     @EnvironmentObject private var store: TrackingStore
 
     var body: some View {
+        //MARK: TESTING NOTIFICATION
+        VStack{
+            Button("Test Luteal Notification") {
+                Task {
+                    let granted = await NotificationManager.shared
+                        .requestPermission()
+
+                    if granted {
+                        await CycleNotification.shared
+                            .scheduleLutealNotification()
+                    } else {
+                        print("Notifications not authorised")
+                    }
+                }
+            }
+            .buttonStyle(.borderedProminent)
+        }
         TabView(selection: $navigation.selectedTab) {
             // Placeholder Home until a dedicated home screen is ported.
             ScrollView {
@@ -45,6 +62,13 @@ struct ContentView: View {
                     Text("Exercise")
                 }
                 .tag(AppNavigationViewModel.Tab.exercise)
+            
+            PeriodTJournal()
+                .tabItem {
+                    Image(systemName: "book.closed")
+                    Text("Journal")
+                }
+                .tag(AppNavigationViewModel.Tab.journal)
         }
         .tint(CoreColor.primary)
         .task { await store.load() }

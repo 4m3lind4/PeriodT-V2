@@ -1,0 +1,9 @@
+{
+    "Simulator Target Bundle": "Jessica.a.m.PeriodT-V2",
+    "aps": {
+        "alert": {
+            "title": "This is test notification",
+            "body": "Test notification Body"
+        }
+    }
+}

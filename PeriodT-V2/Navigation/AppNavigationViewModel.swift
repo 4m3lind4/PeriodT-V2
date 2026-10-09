@@ -12,7 +12,7 @@ import SwiftUI
 /// App-wide navigation state so deep screens can pop back and switch tabs.
 final class AppNavigationViewModel: ObservableObject {
     enum Tab: Int {
-        case home, calendar, exercise
+        case home, calendar, exercise, journal
     }
 
     @Published var selectedTab: Tab = .home
