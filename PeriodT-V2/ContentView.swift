@@ -19,14 +19,14 @@ struct ContentView: View {
     var body: some View {
         //MARK: TESTING NOTIFICATION
         VStack{
-            Button("Test Luteal Notification") {
+            Button("Test Phase Notification") {
                 Task {
                     let granted = await NotificationManager.shared
                         .requestPermission()
 
                     if granted {
                         await CycleNotification.shared
-                            .scheduleLutealNotification()
+                            .schedulePhaseNotification(for: store.allReviews)
                     } else {
                         print("Notifications not authorised")
                     }

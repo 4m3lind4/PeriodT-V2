@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		7F944EA93071539100DC27BE /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 7F944EA83071539100DC27BE /* Supabase */; };
 		7F944F03307849D200DC27BE /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 7F944F02307849D200DC27BE /* Lottie */; };
+		7F944F6B307973A400DC27BE /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F944F6A307973A400DC27BE /* WidgetKit.framework */; };
+		7F944F6D307973A400DC27BE /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F944F6C307973A400DC27BE /* SwiftUI.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,7 +34,20 @@
 		7F944D28306E0E0600DC27BE /* PeriodT-V2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PeriodT-V2.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F944D35306E0E0800DC27BE /* PeriodT-V2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "PeriodT-V2Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F944D3F306E0E0800DC27BE /* PeriodT-V2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "PeriodT-V2UITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F944F69307973A400DC27BE /* PeriodTWidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PeriodTWidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F944F6A307973A400DC27BE /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		7F944F6C307973A400DC27BE /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		7F944F7A307973A500DC27BE /* Exceptions for "PeriodTWidgetExtension" folder in "PeriodTWidgetExtensionExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 7F944F68307973A400DC27BE /* PeriodTWidgetExtensionExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		7F944D2A306E0E0600DC27BE /* PeriodT-V2 */ = {
@@ -48,6 +63,14 @@
 		7F944D42306E0E0800DC27BE /* PeriodT-V2UITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "PeriodT-V2UITests";
+			sourceTree = "<group>";
+		};
+		7F944F6E307973A400DC27BE /* PeriodTWidgetExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				7F944F7A307973A500DC27BE /* Exceptions for "PeriodTWidgetExtension" folder in "PeriodTWidgetExtensionExtension" target */,
+			);
+			path = PeriodTWidgetExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -76,6 +99,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7F944F66307973A400DC27BE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7F944F6D307973A400DC27BE /* SwiftUI.framework in Frameworks */,
+				7F944F6B307973A400DC27BE /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -85,6 +117,7 @@
 				7F944D2A306E0E0600DC27BE /* PeriodT-V2 */,
 				7F944D38306E0E0800DC27BE /* PeriodT-V2Tests */,
 				7F944D42306E0E0800DC27BE /* PeriodT-V2UITests */,
+				7F944F6E307973A400DC27BE /* PeriodTWidgetExtension */,
 				7F944EA73071539100DC27BE /* Frameworks */,
 				7F944D29306E0E0600DC27BE /* Products */,
 			);
@@ -96,6 +129,7 @@
 				7F944D28306E0E0600DC27BE /* PeriodT-V2.app */,
 				7F944D35306E0E0800DC27BE /* PeriodT-V2Tests.xctest */,
 				7F944D3F306E0E0800DC27BE /* PeriodT-V2UITests.xctest */,
+				7F944F69307973A400DC27BE /* PeriodTWidgetExtensionExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -103,6 +137,8 @@
 		7F944EA73071539100DC27BE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7F944F6A307973A400DC27BE /* WidgetKit.framework */,
+				7F944F6C307973A400DC27BE /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -180,6 +216,28 @@
 			productReference = 7F944D3F306E0E0800DC27BE /* PeriodT-V2UITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		7F944F68307973A400DC27BE /* PeriodTWidgetExtensionExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7F944F7B307973A500DC27BE /* Build configuration list for PBXNativeTarget "PeriodTWidgetExtensionExtension" */;
+			buildPhases = (
+				7F944F65307973A400DC27BE /* Sources */,
+				7F944F66307973A400DC27BE /* Frameworks */,
+				7F944F67307973A400DC27BE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				7F944F6E307973A400DC27BE /* PeriodTWidgetExtension */,
+			);
+			name = PeriodTWidgetExtensionExtension;
+			packageProductDependencies = (
+			);
+			productName = PeriodTWidgetExtensionExtension;
+			productReference = 7F944F69307973A400DC27BE /* PeriodTWidgetExtensionExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -200,6 +258,9 @@
 					7F944D3E306E0E0800DC27BE = {
 						CreatedOnToolsVersion = 26.5;
 						TestTargetID = 7F944D27306E0E0600DC27BE;
+					};
+					7F944F68307973A400DC27BE = {
+						CreatedOnToolsVersion = 26.5;
 					};
 				};
 			};
@@ -224,6 +285,7 @@
 				7F944D27306E0E0600DC27BE /* PeriodT-V2 */,
 				7F944D34306E0E0800DC27BE /* PeriodT-V2Tests */,
 				7F944D3E306E0E0800DC27BE /* PeriodT-V2UITests */,
+				7F944F68307973A400DC27BE /* PeriodTWidgetExtensionExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -250,6 +312,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7F944F67307973A400DC27BE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -268,6 +337,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		7F944D3B306E0E0800DC27BE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7F944F65307973A400DC27BE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -559,6 +635,72 @@
 			};
 			name = Release;
 		};
+		7F944F7C307973A500DC27BE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7LYGPBJD5C;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PeriodTWidgetExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PeriodTWidgetExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Jessica.a.m.PeriodTWidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		7F944F7D307973A500DC27BE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7LYGPBJD5C;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PeriodTWidgetExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PeriodTWidgetExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Jessica.a.m.PeriodTWidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -594,6 +736,15 @@
 			buildConfigurations = (
 				7F944D50306E0E0800DC27BE /* Debug */,
 				7F944D51306E0E0800DC27BE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7F944F7B307973A500DC27BE /* Build configuration list for PBXNativeTarget "PeriodTWidgetExtensionExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7F944F7C307973A500DC27BE /* Debug */,
+				7F944F7D307973A500DC27BE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
