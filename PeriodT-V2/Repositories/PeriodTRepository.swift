@@ -77,6 +77,25 @@ struct PeriodTRepository: IPeriodTRepository {
         }
     }
 
+    /// RLS returns only this user's rows, so no filter is needed.
+    func fetchPollAnswers() async throws -> [PollAnswers] {
+        try await signInIfNeeded()
+        return try await client
+            .from("daily_reviews")
+            .select("day, answers, emotion, intensity, journal")
+            .execute()
+            .value
+    }
+
+    /// One row per user per day, so a second save for the same day overwrites the first.
+    func savePollAnswers(_ answers: PollAnswers) async throws {
+        try await signInIfNeeded()
+        try await client
+            .from("daily_reviews")
+            .upsert(answers, onConflict: "user_id,day")
+            .execute()
+    }
+
     /// Gives this device its own Supabase user the first time, with no login screen.
     /// The session is saved in the Keychain, so later launches reuse the same user.
     private func signInIfNeeded() async throws {

@@ -6,12 +6,10 @@
 //
 
 import SwiftUI
-import SwiftData
 
 /// Calendar tab: shows the period-due countdown above a scrolling 3-month calendar.
 struct PeriodTTracking: View {
-    @Query(sort: \PollAnswers.date, order: .reverse)
-    private var allAnswers: [PollAnswers]
+    @EnvironmentObject private var store: TrackingStore
 
     private let periodDue = PeriodDueViewModel()
 
@@ -21,7 +19,7 @@ struct PeriodTTracking: View {
                 Text("Period Due")
                     .font(Font.system(size: 20, design: .rounded))
                     .foregroundColor(CoreColor.primary)
-                Text(periodDue.dueText(for: allAnswers))
+                Text(periodDue.dueText(for: store.allReviews))
                     .font(Font.system(size: 30,weight: .bold, design: .rounded))
                     .foregroundColor(CoreColor.primary)
                     .frame(width: 300)
@@ -36,6 +34,7 @@ struct PeriodTTracking: View {
             }
         }
         .ignoresSafeArea(edges: .bottom)
+        .refreshable { await store.load() }
         // Shows the slide-up card for future-day taps and failed saves
         // raised anywhere inside the calendar.
         .errorCardHost()
@@ -44,4 +43,5 @@ struct PeriodTTracking: View {
 
 #Preview {
     PeriodTTracking()
+        .previewTrackingStore()
 }

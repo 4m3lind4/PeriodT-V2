@@ -12,17 +12,21 @@ import Foundation
 final class MockPeriodTRepository: IPeriodTRepository {
 
     private var programs: [ExerciseProgram]
+    private var pollAnswers: [Date: PollAnswers]
     private let delay: Duration
     private let shouldFail: Bool
 
     /// - Parameters:
     ///   - programs: Starting data. Defaults to `samplePrograms`.
+    ///   - pollAnswers: Starting daily reviews. Defaults to `samplePollAnswers`.
     ///   - delay: Fake network wait, handy for seeing loading states.
     ///   - shouldFail: Throw from every call, handy for previewing error states.
     init(programs: [ExerciseProgram] = MockPeriodTRepository.samplePrograms,
+         pollAnswers: [PollAnswers] = MockPeriodTRepository.samplePollAnswers,
          delay: Duration = .zero,
          shouldFail: Bool = false) {
         self.programs = programs
+        self.pollAnswers = Dictionary(pollAnswers.map { ($0.date, $0) }, uniquingKeysWith: { _, last in last })
         self.delay = delay
         self.shouldFail = shouldFail
     }
@@ -53,6 +57,16 @@ final class MockPeriodTRepository: IPeriodTRepository {
                                           numberOfExercises: old.numberOfExercises,
                                           exerciseType: old.exerciseType,
                                           workouts: updated)
+    }
+
+    func fetchPollAnswers() async throws -> [PollAnswers] {
+        try await simulateNetwork()
+        return Array(pollAnswers.values)
+    }
+
+    func savePollAnswers(_ answers: PollAnswers) async throws {
+        try await simulateNetwork()
+        pollAnswers[answers.date] = answers
     }
 
     private func simulateNetwork() async throws {
@@ -109,6 +123,39 @@ extension MockPeriodTRepository {
             ("Plank", nil)
         ])
     ]
+
+    /// Period logged on the last 4 days, plus a few non-period days, so the calendar
+    /// shows a joined pill. "Period Due" counts from yesterday, so it reads 27 Days.
+    static let samplePollAnswers: [PollAnswers] = [
+        sampleReview(daysFromToday: -6, trained: .yes, onPeriod: .no, emotion: .happy, intensity: 4,
+                     journal: "Felt strong on the squats today."),
+        sampleReview(daysFromToday: -5, trained: .yes, onPeriod: .no, emotion: .calm, intensity: 3,
+                     journal: ""),
+        sampleReview(daysFromToday: -4, trained: .no, onPeriod: .yes, emotion: .sad, intensity: 1,
+                     journal: "Cramps all morning, skipped training."),
+        sampleReview(daysFromToday: -3, trained: .yes, onPeriod: .yes, emotion: .neutral, intensity: 2,
+                     journal: "Light physio session, went okay."),
+        sampleReview(daysFromToday: -2, trained: .no, onPeriod: .yes, emotion: .stressed, intensity: 1,
+                     journal: ""),
+        sampleReview(daysFromToday: -1, trained: .yes, onPeriod: .yes, emotion: .calm, intensity: 3,
+                     journal: "Feeling better, energy coming back.")
+    ]
+
+    private static func sampleReview(daysFromToday: Int,
+                                     trained: ReviewAnswer,
+                                     onPeriod: ReviewAnswer,
+                                     emotion: Emotion,
+                                     intensity: Int,
+                                     journal: String) -> PollAnswers {
+        let day = Calendar.current.date(byAdding: .day, value: daysFromToday, to: Date().startOfDay)!
+        var review = PollAnswers(date: day)
+        review.setAnswer(trained, for: .trained)
+        review.setAnswer(onPeriod, for: .onPeriod)
+        review.emotion = emotion
+        review.intensity = intensity
+        review.journal = journal
+        return review
+    }
 
     private static func sampleProgram(daysFromToday: Int,
                                       day: Int,

@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 /// "Review" section on Home - the daily poll for today.
 struct HomeQuestionaireView: View {
@@ -23,5 +22,5 @@ struct HomeQuestionaireView: View {
 
 #Preview {
     HomeQuestionaireView()
-        .modelContainer(for: PollAnswers.self, inMemory: true)
+        .previewTrackingStore()
 }

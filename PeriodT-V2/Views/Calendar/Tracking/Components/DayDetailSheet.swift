@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 /// Semi-transparent pink sheet shown when a calendar day is tapped,
 /// letting the user review and change that day's poll answers.
@@ -39,5 +38,5 @@ struct DayDetailSheet: View {
         .sheet(isPresented: .constant(true)) {
             DayDetailSheet(day: .now)
         }
-        .modelContainer(for: PollAnswers.self, inMemory: true)
+        .previewTrackingStore()
 }

@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 /// Scrolling 3-month calendar grid. Highlights predicted period days,
 /// logged period days, and days where a program was submitted.
@@ -21,16 +20,15 @@ struct CalendarView: View {
     /// `errorCardHost` shows the card.
     @Environment(\.presentError) private var presentError
 
-    @Query private var allAnswers: [PollAnswers]
-    @Query private var completedPrograms: [CompletedProgram]
+    @EnvironmentObject private var store: TrackingStore
 
-    /// True when the user submitted a program that was due on this day.
+    /// True when the user ticked off a workout in a program due on this day.
     private func completedProgram(on day: Date) -> Bool {
-        completedPrograms.contains { $0.date == day.startOfDay }
+        store.completedProgramDays.contains(day.startOfDay)
     }
 
     private func answers(for day: Date) -> PollAnswers? {
-        allAnswers.first { $0.date == day.startOfDay }
+        store.review(for: day)
     }
 
     /// True when the user answered "yes" to being on their period that day.
@@ -194,5 +192,5 @@ struct CalendarView: View {
 #Preview {
     CalendarView(calendarViewModel: CalendarViewModel())
     .errorCardHost()
-    .modelContainer(for: [PollAnswers.self, CompletedProgram.self], inMemory: true)
+    .previewTrackingStore()
 }

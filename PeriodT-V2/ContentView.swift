@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 /// Root of the app: a three-tab layout (Home, Calendar, Exercise).
 /// Tab selection and the exercise navigation stack live in `AppNavigationViewModel`
@@ -15,6 +14,7 @@ struct ContentView: View {
     let repository: IPeriodTRepository
 
     @EnvironmentObject private var navigation: AppNavigationViewModel
+    @EnvironmentObject private var store: TrackingStore
 
     var body: some View {
         TabView(selection: $navigation.selectedTab) {
@@ -47,11 +47,16 @@ struct ContentView: View {
                 .tag(AppNavigationViewModel.Tab.exercise)
         }
         .tint(CoreColor.primary)
+        .task { await store.load() }
+        // Ticking workouts changes the calendar dots, so refresh on leaving Exercise.
+        .onChange(of: navigation.selectedTab) { _, _ in
+            Task { await store.load() }
+        }
     }
 }
 
 #Preview {
     ContentView(repository: MockPeriodTRepository())
         .environmentObject(AppNavigationViewModel())
-        .modelContainer(for: [PollAnswers.self, CompletedProgram.self], inMemory: true)
+        .previewTrackingStore()
 }

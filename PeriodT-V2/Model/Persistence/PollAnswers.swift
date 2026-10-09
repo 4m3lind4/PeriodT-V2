@@ -6,28 +6,25 @@
 //
 
 import Foundation
-import SwiftData
-import OSLog
 
-/// The user's yes/no poll answers for one calendar day. One record per day.
-@Model
-final class PollAnswers {
-    private static let logger = Logger(subsystem: "PeriodT", category: "PollAnswers")
-    @Attribute(.unique) var date: Date
+/// The user's poll answers, mood and journal for one calendar day.
+/// One row per user per day in Supabase's `daily_reviews` table.
+struct PollAnswers: Codable, Equatable {
+    /// The calendar day, normalised to `startOfDay`.
+    let date: Date
 
-    /// Stored as raw strings — SwiftData can't persist enum-keyed dictionaries.
+    /// Keyed by `PollQuestionKind.rawValue`; stored as a jsonb object.
     private var rawAnswers: [String: String] = [:]
 
     /// Free-text journal entry for the day.
     var journal: String = ""
 
-    /// `Emotion.rawValue`; stored as a string so SwiftData can persist it.
+    /// `Emotion.rawValue`; unknown values read as nil.
     private var rawEmotion: String?
 
     /// 0 (very unpleasant) ... 4 (very pleasant). Nil until the user moves the slider.
     var intensity: Int?
 
-    /// Typed view of `rawEmotion`; an unknown stored value reads as nil.
     var emotion: Emotion? {
         get { rawEmotion.flatMap(Emotion.init(rawValue:)) }
         set { rawEmotion = newValue?.rawValue }
@@ -53,39 +50,56 @@ final class PollAnswers {
         rawAnswers[question.kind.rawValue].flatMap(ReviewAnswer.init(rawValue:))
     }
 
-    func setAnswer(_ answer: ReviewAnswer, for question: PollQuestion) {
-        rawAnswers[question.kind.rawValue] = answer.rawValue
+    mutating func setAnswer(_ answer: ReviewAnswer, for question: PollQuestion) {
+        setAnswer(answer, for: question.kind)
     }
 
-    /// Returns the existing record for `day`, or inserts a fresh one.
-    /// A failed fetch is logged and treated as "no record yet" — because
-    /// `date` is unique, inserting a duplicate upserts rather than doubling up.
-    static func fetchOrCreate(for day: Date, in context: ModelContext) -> PollAnswers {
-        let start = day.startOfDay
-        let descriptor = FetchDescriptor<PollAnswers>(
-            predicate: #Predicate { $0.date == start }
-        )
-        do {
-            if let existing = try context.fetch(descriptor).first {
-                return existing
-            }
-        } catch {
-            logger.error("Failed to fetch PollAnswers for \(start): \(error.localizedDescription)")
-        }
-        let new = PollAnswers(date: start)
-        context.insert(new)
-        return new
+    mutating func setAnswer(_ answer: ReviewAnswer, for kind: PollQuestionKind) {
+        rawAnswers[kind.rawValue] = answer.rawValue
     }
 
-    /// Persists any pending changes. Returns false (and logs) if the save fails.
-    @discardableResult
-    static func save(_ context: ModelContext) -> Bool {
-        do {
-            try context.save()
-            return true
-        } catch {
-            logger.error("Failed to save poll answers: \(error.localizedDescription)")
-            return false
+    // MARK: - Supabase row
+
+    /// `user_id` is left out: the database fills it from the signed-in user.
+    enum CodingKeys: String, CodingKey {
+        case date = "day"
+        case rawAnswers = "answers"
+        case rawEmotion = "emotion"
+        case journal, intensity
+    }
+
+    /// `day` is a Postgres `date`, sent as "yyyy-MM-dd" in the local calendar.
+    /// A full timestamp would be converted to UTC and could land on the wrong day.
+    private static let dayFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = .current
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }()
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let dayString = try container.decode(String.self, forKey: .date)
+        guard let day = Self.dayFormatter.date(from: dayString) else {
+            throw DecodingError.dataCorruptedError(forKey: .date, in: container,
+                                                   debugDescription: "Bad day: \(dayString)")
         }
+        date = day.startOfDay
+        rawAnswers = try container.decodeIfPresent([String: String].self, forKey: .rawAnswers) ?? [:]
+        journal = try container.decodeIfPresent(String.self, forKey: .journal) ?? ""
+        rawEmotion = try container.decodeIfPresent(String.self, forKey: .rawEmotion)
+        intensity = try container.decodeIfPresent(Int.self, forKey: .intensity)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(Self.dayFormatter.string(from: date), forKey: .date)
+        try container.encode(rawAnswers, forKey: .rawAnswers)
+        try container.encode(journal, forKey: .journal)
+        // Explicit nulls so clearing a value on an existing row sticks.
+        try container.encode(rawEmotion, forKey: .rawEmotion)
+        try container.encode(intensity, forKey: .intensity)
     }
 }

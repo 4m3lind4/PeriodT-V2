@@ -6,23 +6,22 @@
 //
 
 import SwiftUI
-import SwiftData
 
 /// The stack of poll question cards for a single day, reading and
-/// writing answers straight into that day's `PollAnswers` record.
+/// writing that day's answers through the shared `TrackingStore`.
 struct DayPollView: View {
-    @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var store: TrackingStore
     @Environment(\.presentError) private var presentError
     @StateObject private var viewModel = DayPoleModel()
 
     let day: Date
 
-    @State private var record: PollAnswers?
+    private var record: PollAnswers? { store.review(for: day) }
 
     var body: some View {
         VStack(spacing: 12) {
             ForEach(viewModel.questions) { question in
-                // Each card reads/writes directly into the SwiftData record.
+                // Each card reads/writes the day's review in the store.
                 QuestionCardView(
                     selectedAnswer: Binding(
                         get: { record?.answer(for: question) },
@@ -58,25 +57,17 @@ struct DayPollView: View {
                 )
             )
         }
-        .onAppear {
-            record = PollAnswers.fetchOrCreate(for: day, in: modelContext)
-        }
     }
 
-    /// Applies `mutate` to the day's record (creating it on first use),
-    /// saves immediately, and raises the error card if the save fails.
-    private func update(_ target: AppError.SaveTarget, _ mutate: (PollAnswers) -> Void) {
-        let current = record ?? PollAnswers.fetchOrCreate(for: day, in: modelContext)
-        mutate(current)
-        record = current
-        if !PollAnswers.save(modelContext) {
-            presentError(.saveFailed(target))
-        }
+    /// Applies `mutate` to the day's review (creating it on first use) and
+    /// raises the error card if the Supabase save fails.
+    private func update(_ target: AppError.SaveTarget, _ mutate: (inout PollAnswers) -> Void) {
+        store.update(day, onFailure: { presentError(.saveFailed(target)) }, mutate)
     }
 }
 
 #Preview {
     DayPollView(day: .now)
         .errorCardHost()
-        .modelContainer(for: PollAnswers.self, inMemory: true)
+        .previewTrackingStore()
 }
