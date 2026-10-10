@@ -18,6 +18,8 @@ class PeriodTUITestCase: XCTestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
+        // The launch tests run in every orientation and can leave the simulator in landscape.
+        XCUIDevice.shared.orientation = .portrait
         app = XCUIApplication()
         app.launchArguments = ["-UITesting"] + extraLaunchArguments
         app.launch()

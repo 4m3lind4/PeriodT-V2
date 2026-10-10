@@ -11,13 +11,16 @@ import SwiftUI
 struct PeriodTTracking: View {
     @EnvironmentObject private var store: TrackingStore
 
+    /// Owned here so it survives re-renders; `CalendarView` feeds it the store's reviews.
+    @StateObject private var calendarViewModel = CalendarViewModel()
+
     private let periodDue = PeriodDueViewModel()
 
     var body: some View {
         // The reader lets us jump past the earlier months to the current one.
         ScrollViewReader { proxy in
             ScrollView{
-                CalendarView(calendarViewModel: CalendarViewModel())
+                CalendarView(calendarViewModel: calendarViewModel)
             }
             // Pinned above the calendar so the countdown stays visible while scrolling months.
             .safeAreaInset(edge: .top) {

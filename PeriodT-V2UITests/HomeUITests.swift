@@ -74,11 +74,18 @@ final class HomeUITests: PeriodTUITestCase {
         scrollTo(slider)
         XCTAssertEqual(slider.value as? String, "3 of 5")
 
-        slider.swipeRight()
+        // Drag to the very edges; a plain swipe stops short of the last step.
+        drag(slider, to: 0.99)
         XCTAssertEqual(slider.value as? String, "5 of 5")
 
-        slider.swipeLeft()
+        drag(slider, to: 0.01)
         XCTAssertEqual(slider.value as? String, "1 of 5")
+    }
+
+    private func drag(_ element: XCUIElement, to x: CGFloat) {
+        let start = element.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+        let end = element.coordinate(withNormalizedOffset: CGVector(dx: x, dy: 0.5))
+        start.press(forDuration: 0.05, thenDragTo: end)
     }
 
     @MainActor

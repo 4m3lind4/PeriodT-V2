@@ -112,8 +112,17 @@ struct ExerciseProgramTests {
         #expect(Fixtures.program(on: today.addingTimeInterval(23 * 3600 + 59 * 60)).status == .current)
     }
 
-    @Test func programYesterdayIsCompleted() {
-        #expect(Fixtures.program(on: TestDates.daysFromToday(-1)).status == .completed)
+    @Test func pastProgramWithAllWorkoutsTickedIsCompleted() {
+        let done = Workout(name: "Plank", sets: 3, isCompleted: true)
+        #expect(Fixtures.program(on: TestDates.daysFromToday(-1), workouts: [done, done]).status == .completed)
+    }
+
+    @Test func pastProgramWithUntickedWorkoutsIsMissed() {
+        let done = Workout(name: "Plank", sets: 3, isCompleted: true)
+        let notDone = Workout(name: "Squat", sets: 3)
+        #expect(Fixtures.program(on: TestDates.daysFromToday(-1)).status == .missed)
+        #expect(Fixtures.program(on: TestDates.daysFromToday(-1), workouts: [done, notDone]).status == .missed)
+        #expect(Fixtures.program(on: TestDates.daysFromToday(-1), workouts: []).status == .missed)
     }
 
     @Test func programTomorrowIsIncoming() {

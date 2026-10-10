@@ -13,37 +13,76 @@ import Testing
 @MainActor
 @Suite("CalendarViewModel")
 struct CalendarViewModelTests {
-    private let viewModel = CalendarViewModel()
+    /// A five-day period logged from 10 to 6 days ago, plus an unrelated non-period review.
+    private let reviews = (6...10).map { Fixtures.period(daysAgo: $0) }
+        + [Fixtures.review(on: TestDates.daysFromToday(-2), onPeriod: .no)]
 
-    @Test func prePeriodIsTheThreeDaysBeforeToday() {
-        #expect(viewModel.prePeriodDates.count == 3)
-        #expect(viewModel.isPrePeriodDay(TestDates.daysFromToday(-1)))
-        #expect(viewModel.isPrePeriodDay(TestDates.daysFromToday(-3)))
-        #expect(!viewModel.isPrePeriodDay(TestDates.daysFromToday(-4)))
-        #expect(!viewModel.isPrePeriodDay(Date()))
+    private var viewModel: CalendarViewModel { CalendarViewModel(reviews: reviews) }
+
+    @Test func nothingLoggedMeansNothingPredicted() {
+        let viewModel = CalendarViewModel()
+        #expect(viewModel.loggedPeriodDates.isEmpty)
+        #expect(viewModel.periodDates.isEmpty)
+        #expect(viewModel.prePeriodDates.isEmpty)
+        #expect(viewModel.amountOfPeriodDays == 6)
     }
 
-    @Test func predictsTwoSixDayPeriods() {
-        #expect(viewModel.periodDates.count == 12)
-        #expect(!viewModel.isPeriodDay(TestDates.daysFromToday(6)))
-        #expect(viewModel.isPeriodDay(TestDates.daysFromToday(7)))
-        #expect(viewModel.isPeriodDay(TestDates.daysFromToday(12)))
-        #expect(!viewModel.isPeriodDay(TestDates.daysFromToday(13)))
-        // Next cycle starts 21 days after the last predicted day (+12).
-        #expect(!viewModel.isPeriodDay(TestDates.daysFromToday(32)))
-        #expect(viewModel.isPeriodDay(TestDates.daysFromToday(33)))
-        #expect(viewModel.isPeriodDay(TestDates.daysFromToday(38)))
-        #expect(!viewModel.isPeriodDay(TestDates.daysFromToday(39)))
+    @Test func loggedPeriodDaysComeFromYesAnswers() {
+        let viewModel = viewModel
+        #expect(viewModel.loggedPeriodDates.count == 5)
+        #expect(viewModel.isLoggedPeriodDay(TestDates.daysFromToday(-6)))
+        #expect(viewModel.isLoggedPeriodDay(TestDates.daysFromToday(-10)))
+        #expect(!viewModel.isLoggedPeriodDay(TestDates.daysFromToday(-5)))
+        #expect(!viewModel.isLoggedPeriodDay(TestDates.daysFromToday(-2)))
+    }
+
+    @Test func predictedLengthIsTheAverageLoggedPeriod() {
+        // Runs of 5 and 2 days average to 3.5, which rounds to 4.
+        let viewModel = CalendarViewModel(reviews: reviews + [Fixtures.period(daysAgo: 40),
+                                                              Fixtures.period(daysAgo: 41)])
+        #expect(viewModel.amountOfPeriodDays == 4)
+    }
+
+    @Test func predictsTwoPeriodsACycleApart() {
+        let viewModel = viewModel
+        // Last logged day is -6, so the next period starts 28 days later at +22.
+        #expect(viewModel.periodBatches().map(\.count) == [5, 5])
+        #expect(!viewModel.isPeriodDay(TestDates.daysFromToday(21)))
+        #expect(viewModel.isPeriodDay(TestDates.daysFromToday(22)))
+        #expect(viewModel.isPeriodDay(TestDates.daysFromToday(26)))
+        #expect(!viewModel.isPeriodDay(TestDates.daysFromToday(27)))
+        #expect(!viewModel.isPeriodDay(TestDates.daysFromToday(49)))
+        #expect(viewModel.isPeriodDay(TestDates.daysFromToday(50)))
+        #expect(viewModel.isPeriodDay(TestDates.daysFromToday(54)))
+        #expect(!viewModel.isPeriodDay(TestDates.daysFromToday(55)))
+    }
+
+    @Test func prePeriodIsTheThreeDaysBeforeTheNextPeriod() {
+        let viewModel = viewModel
+        #expect(viewModel.prePeriodDates.count == 3)
+        #expect(viewModel.isPrePeriodDay(TestDates.daysFromToday(21)))
+        #expect(viewModel.isPrePeriodDay(TestDates.daysFromToday(19)))
+        #expect(!viewModel.isPrePeriodDay(TestDates.daysFromToday(18)))
+        #expect(!viewModel.isPrePeriodDay(TestDates.daysFromToday(22)))
+    }
+
+    @Test func updateReplacesEarlierData() {
+        let viewModel = viewModel
+        viewModel.update(with: [])
+        #expect(viewModel.loggedPeriodDates.isEmpty)
+        #expect(viewModel.periodDates.isEmpty)
+        #expect(viewModel.prePeriodDates.isEmpty)
+    }
+
+    @Test func periodsAsLongAsTheCycleStillFinish() {
+        // Logging every day for 30 days makes predicted periods overlap into one run.
+        let viewModel = CalendarViewModel(reviews: (1...30).map { Fixtures.period(daysAgo: $0) })
+        #expect(viewModel.periodBatches().count == 1)
     }
 
     @Test func isPeriodDayIgnoresTimeOfDay() {
-        let evening = TestDates.daysFromToday(7).addingTimeInterval(22 * 3600)
+        let evening = TestDates.daysFromToday(22).addingTimeInterval(22 * 3600)
         #expect(viewModel.isPeriodDay(evening))
-    }
-
-    @Test func periodBatchesGroupConsecutiveDays() {
-        let batches = viewModel.periodBatches()
-        #expect(batches.map(\.count) == [6, 6])
     }
 
     @Test func periodBatchesSplitOnGapsAndSort() {
@@ -59,7 +98,6 @@ struct CalendarViewModelTests {
 
     @Test func periodBatchesEmpty() {
         let viewModel = CalendarViewModel()
-        viewModel.periodDates = []
         #expect(viewModel.periodBatches().isEmpty)
         // Nothing to extend from, so no new cycle is added.
         viewModel.calculateNewMonthPeriod()

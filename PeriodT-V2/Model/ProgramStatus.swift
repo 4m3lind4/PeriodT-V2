@@ -7,13 +7,15 @@
 
 import SwiftUI
 
-/// Where a program sits relative to today. Drives grouping and the card's stripe colour.
+/// Where a program sits relative to today and whether it was done.
+/// Drives grouping and the card's stripe colour.
 enum ProgramStatus {
-    case completed, current, incoming
+    case completed, missed, current, incoming
 
     var color: Color {
         switch self {
         case .completed: CoreColor.completed
+        case .missed:    CoreColor.missed
         case .current:   CoreColor.current
         case .incoming:  CoreColor.incoming
         }
@@ -21,9 +23,16 @@ enum ProgramStatus {
 }
 
 extension ExerciseProgram {
-    /// Today is current, earlier days are completed, later days are incoming.
+    /// Every workout has been ticked off. A program with no workouts is never complete.
+    var isCompleted: Bool {
+        !workouts.isEmpty && workouts.allSatisfy(\.isCompleted)
+    }
+
+    /// Today is current and later days are incoming. Earlier days are completed
+    /// only if every workout was ticked, otherwise missed.
     var status: ProgramStatus {
         if Calendar.current.isDateInToday(date) { return .current }
-        return date < Date() ? .completed : .incoming
+        if date > Date() { return .incoming }
+        return isCompleted ? .completed : .missed
     }
 }

@@ -16,7 +16,7 @@
 import SwiftUI
 import Lottie
 
-/// Exercise tab: lists programs grouped into today, incoming and completed,
+/// Exercise tab: lists programs grouped into today, incoming, missed and completed,
 /// with one card expandable at a time. Physio programs are marked on the card itself.
 struct PeriodTExercises: View {
     let repository: IPeriodTRepository
@@ -29,6 +29,7 @@ struct PeriodTExercises: View {
     // Only one card is open at once; shared across all sections.
     @State private var expandedProgramID: ExerciseProgram.ID?
     @State private var showAllIncoming = false
+    @State private var showAllMissed = false
     @State private var showAllCompleted = false
 
     /// Cards shown per section before "View More".
@@ -41,7 +42,11 @@ struct PeriodTExercises: View {
     var incomingPrograms: [ExerciseProgram] {
         exerciseData.filter { $0.status == .incoming }
     }
-    /// Most recent first.
+    /// Past programs with workouts left unticked. Most recent first.
+    var missedPrograms: [ExerciseProgram] {
+        exerciseData.filter { $0.status == .missed }.reversed()
+    }
+    /// Past programs with every workout ticked. Most recent first.
     var completedPrograms: [ExerciseProgram] {
         exerciseData.filter { $0.status == .completed }.reversed()
     }
@@ -78,6 +83,7 @@ struct PeriodTExercises: View {
                 }
 
                 programSection(title: "Incoming", programs: incomingPrograms, showAll: $showAllIncoming)
+                programSection(title: "Missed", programs: missedPrograms, showAll: $showAllMissed)
                 programSection(title: "Completed", programs: completedPrograms, showAll: $showAllCompleted)
             }
             .padding(16)

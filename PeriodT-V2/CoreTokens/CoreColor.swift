@@ -34,6 +34,8 @@ public final class CoreColor {
     
     // MARK: Active Colours
     static let completed      = Color(hex: "#F08054") // Completed
+
+    static let missed         = Color(hex: "#B9AAB2") // Missed (past, not finished)
     
     static let current        = Color(hex: "#DB6E96") // Current
     

@@ -27,13 +27,9 @@ struct CalendarView: View {
         store.completedProgramDays.contains(day.startOfDay)
     }
 
-    private func answers(for day: Date) -> PollAnswers? {
-        store.review(for: day)
-    }
-
     /// True when the user answered "yes" to being on their period that day.
     private func loggedPeriod(on day: Date) -> Bool {
-        answers(for: day)?.answers[.onPeriod] == .yes
+        calendarViewModel.isLoggedPeriodDay(day)
     }
 
     /// Capsule that joins up with neighbouring logged days so a run of
@@ -102,6 +98,10 @@ struct CalendarView: View {
             }
         }
         .padding()
+        // Keeps the view model's logged and predicted days in step with the store.
+        .onChange(of: store.reviews, initial: true) { _, _ in
+            calendarViewModel.update(with: store.allReviews)
+        }
         .sheet(item: $selectedDay) { selected in
             DayDetailSheet(day: selected.date)
         }

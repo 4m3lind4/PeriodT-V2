@@ -10,8 +10,7 @@ import SwiftUI
 /// Home tab: greeting, week strip, cycle ring, forecast chart,
 /// program carousel, goal progress and the daily review poll.
 struct PeriodTHome: View {
-    let repository: IPeriodTRepository
-    @State private var programs: [ExerciseProgram] = []
+    @EnvironmentObject private var store: TrackingStore
 
     private let viewModel = WeekSelectorViewModel()
 
@@ -35,7 +34,8 @@ struct PeriodTHome: View {
                     .padding(30)
                 ChartItem()
                 Spacer()
-                ProgramViews(programs: programs)                    .padding(.horizontal,-20)
+                ProgramViews(programs: store.programs(on: Date()))
+                    .padding(.horizontal,-20)
                 ProgressSection()
                 Spacer()
                 HomeQuestionaireView()
@@ -57,8 +57,6 @@ struct PeriodTHome: View {
         // Keeps Submit clear of the floating tab bar.
         .contentMargins(.bottom, 100, for: .scrollContent)
         }
-        .task { await load() }
-
     }
     
 
@@ -80,14 +78,6 @@ struct PeriodTHome: View {
             }
         }
     }
-    
-    private func load() async {
-        do {
-            programs = try await repository.fetchWorkouts()
-        } catch {
-            print("Failed to load programs: \(error)")
-        }
-    }
 
 }
 
@@ -95,6 +85,7 @@ struct PeriodTHome: View {
 
 
 #Preview {
-    PeriodTHome(repository: MockPeriodTRepository())
+    PeriodTHome()
+        .previewTrackingStore()
 }
 

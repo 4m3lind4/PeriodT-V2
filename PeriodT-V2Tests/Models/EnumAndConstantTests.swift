@@ -53,6 +53,7 @@ struct EnumAndConstantTests {
 
     @Test func programStatusColours() {
         #expect(ProgramStatus.completed.color == CoreColor.completed)
+        #expect(ProgramStatus.missed.color == CoreColor.missed)
         #expect(ProgramStatus.current.color == CoreColor.current)
         #expect(ProgramStatus.incoming.color == CoreColor.incoming)
     }

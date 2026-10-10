@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import Combine
 import OSLog
+import WidgetKit
 
 /// App-wide cache of the user's daily reviews, backed by Supabase.
 /// Home, the calendar and the day sheet all read from here, so an edit in
@@ -18,7 +19,9 @@ final class TrackingStore: ObservableObject {
     private static let logger = Logger(subsystem: "PeriodT", category: "TrackingStore")
 
     /// Keyed by `startOfDay`.
-    @Published private(set) var reviews: [Date: PollAnswers] = [:]
+    @Published private(set) var reviews: [Date: PollAnswers] = [:] {
+        didSet { syncPeriodWidget() }
+    }
     /// Days with a program that has at least one ticked workout (calendar dots).
     @Published private(set) var completedProgramDays: Set<Date> = []
     /// Every program the user can see, for showing a day's workout in the calendar sheet.
@@ -88,6 +91,16 @@ final class TrackingStore: ObservableObject {
                 Self.logger.error("Failed to save review for \(key): \(error.localizedDescription)")
                 onFailure()
             }
+        }
+    }
+
+    /// Hands the latest period start to the home-screen widget so its countdown stays current.
+    private func syncPeriodWidget() {
+        let periodDue = PeriodDueViewModel()
+        let changed = PeriodCountdownStore.save(lastPeriod: periodDue.lastReportedPeriod(in: allReviews),
+                                                cycleLength: periodDue.cycleLength)
+        if changed {
+            WidgetCenter.shared.reloadTimelines(ofKind: PeriodCountdownStore.widgetKind)
         }
     }
 }

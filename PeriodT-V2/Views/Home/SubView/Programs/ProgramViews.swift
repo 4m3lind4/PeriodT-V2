@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// "Today Programs" section: heading plus a horizontal scroll of program cards.
+/// "Today Programs" section: heading plus a horizontal scroll of today's program cards.
 struct ProgramViews: View {
     let programs: [ExerciseProgram]
 
@@ -30,7 +30,7 @@ struct ProgramViews: View {
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
-                        ForEach(programs.prefix(5)) { program in
+                        ForEach(programs) { program in
                             ProgramCard(program: program)
                         }
                     }

@@ -23,7 +23,7 @@ struct ContentView: View {
         TabView(selection: $navigation.selectedTab) {
             // Placeholder Home until a dedicated home screen is ported.
             // PeriodTHome scrolls itself (so its Submit can jump back to the top).
-            PeriodTHome(repository: repository)
+            PeriodTHome()
                 .padding(.horizontal)
                 .errorCardHost()
                 .tabItem {

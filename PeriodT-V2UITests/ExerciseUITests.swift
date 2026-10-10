@@ -131,9 +131,12 @@ final class ExerciseUITests: PeriodTUITestCase {
         scrollTo(finish)
         finish.tap()
 
-        XCTAssertTrue(app.staticTexts["Workout Logged"].waitForExistence(timeout: timeout))
-        // The celebration plays once, then the app jumps back to Home.
-        XCTAssertTrue(app.staticTexts["Good Morning!"].waitForExistence(timeout: 20))
+        // The celebration plays once, then the app jumps back to Home. It can finish
+        // between polls, so accept either the celebration or Home having already appeared.
+        let celebration = app.staticTexts["Workout Logged"]
+        let home = app.staticTexts["Good Morning!"]
+        XCTAssertTrue(celebration.waitForExistence(timeout: timeout) || home.exists)
+        XCTAssertTrue(home.waitForExistence(timeout: 20))
         XCTAssertTrue(tabButton(.home).isSelected)
 
         // The exercise stack was cleared, so the tab shows the list again.

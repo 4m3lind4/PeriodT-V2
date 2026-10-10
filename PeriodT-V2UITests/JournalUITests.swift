@@ -98,11 +98,13 @@ final class JournalUITests: PeriodTUITestCase {
         let editor = app.textViews.firstMatch
         editor.tap()
         editor.typeText("UI test entry")
-        app.buttons["Save"].tap()
+        let save = app.buttons["Save"]
+        save.tap()
 
-        // Close the sheet; the new entry should be listed first.
+        // Close the sheet; the new entry should be listed first. ("Entries" is also the
+        // Journal page's own heading, so wait on the sheet's Save button instead.)
         app.swipeDown(velocity: .fast)
-        XCTAssertTrue(waitForNonExistence(app.staticTexts["Entries"]))
+        XCTAssertTrue(waitForNonExistence(save))
         let newEntry = text(containing: "UI test entry")
         scrollTo(newEntry)
         XCTAssertTrue(newEntry.exists)
