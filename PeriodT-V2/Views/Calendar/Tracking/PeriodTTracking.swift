@@ -17,23 +17,11 @@ struct PeriodTTracking: View {
         // The reader lets us jump past the earlier months to the current one.
         ScrollViewReader { proxy in
             ScrollView{
-                VStack(alignment: .center, spacing: 12){
-                    Text("Period Due")
-                        .font(Font.system(size: 20, design: .rounded))
-                        .foregroundColor(CoreColor.primary)
-                    Text(periodDue.dueText(for: store.allReviews))
-                        .font(Font.system(size: 30,weight: .bold, design: .rounded))
-                        .foregroundColor(CoreColor.primary)
-                        .frame(width: 300)
-                        .padding(10)
-                        .background {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(CoreColor.ringBackground)
-                                .shadow(color: .black.opacity(0.25), radius: 0, x: 0, y: 2)
-
-                        }
-                    CalendarView(calendarViewModel: CalendarViewModel())
-                }
+                CalendarView(calendarViewModel: CalendarViewModel())
+            }
+            // Pinned above the calendar so the countdown stays visible while scrolling months.
+            .safeAreaInset(edge: .top) {
+                periodDueHeader
             }
             .onAppear {
                 proxy.scrollTo(CalendarView.currentMonthID, anchor: .top)
@@ -49,6 +37,29 @@ struct PeriodTTracking: View {
         // Shows the slide-up card for future-day taps and failed saves
         // raised anywhere inside the calendar.
         .errorCardHost()
+    }
+
+    /// "Period Due" label and countdown pill.
+    private var periodDueHeader: some View {
+        VStack(alignment: .center, spacing: 12){
+            Text("Period Due")
+                .font(Font.system(size: 20, design: .rounded))
+                .foregroundColor(CoreColor.primary)
+            Text(periodDue.dueText(for: store.allReviews))
+                .font(Font.system(size: 30,weight: .bold, design: .rounded))
+                .foregroundColor(CoreColor.primary)
+                .frame(width: 300)
+                .padding(10)
+                .background {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(CoreColor.ringBackground)
+                        .shadow(color: .black.opacity(0.25), radius: 0, x: 0, y: 2)
+                }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.bottom, 8)
+        // Solid backing so calendar days don't show through as they scroll underneath.
+        .background(Color(.systemBackground))
     }
 }
 

@@ -37,7 +37,7 @@ struct ContentView: View {
         TabView(selection: $navigation.selectedTab) {
             // Placeholder Home until a dedicated home screen is ported.
             ScrollView {
-                HomeQuestionaireView()
+                PeriodTHome(repository: repository)
                     .padding()
             }
                 .errorCardHost()
