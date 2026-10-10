@@ -45,25 +45,25 @@ struct CalendarViewModelTests {
 
     @Test func predictsTwoPeriodsACycleApart() {
         let viewModel = viewModel
-        // Last logged day is -6, so the next period starts 28 days later at +22.
+        // The logged period started at -10, so the next one starts 28 days later at +18.
         #expect(viewModel.periodBatches().map(\.count) == [5, 5])
-        #expect(!viewModel.isPeriodDay(TestDates.daysFromToday(21)))
+        #expect(!viewModel.isPeriodDay(TestDates.daysFromToday(17)))
+        #expect(viewModel.isPeriodDay(TestDates.daysFromToday(18)))
         #expect(viewModel.isPeriodDay(TestDates.daysFromToday(22)))
-        #expect(viewModel.isPeriodDay(TestDates.daysFromToday(26)))
-        #expect(!viewModel.isPeriodDay(TestDates.daysFromToday(27)))
-        #expect(!viewModel.isPeriodDay(TestDates.daysFromToday(49)))
+        #expect(!viewModel.isPeriodDay(TestDates.daysFromToday(23)))
+        #expect(!viewModel.isPeriodDay(TestDates.daysFromToday(45)))
+        #expect(viewModel.isPeriodDay(TestDates.daysFromToday(46)))
         #expect(viewModel.isPeriodDay(TestDates.daysFromToday(50)))
-        #expect(viewModel.isPeriodDay(TestDates.daysFromToday(54)))
-        #expect(!viewModel.isPeriodDay(TestDates.daysFromToday(55)))
+        #expect(!viewModel.isPeriodDay(TestDates.daysFromToday(51)))
     }
 
     @Test func prePeriodIsTheThreeDaysBeforeTheNextPeriod() {
         let viewModel = viewModel
         #expect(viewModel.prePeriodDates.count == 3)
-        #expect(viewModel.isPrePeriodDay(TestDates.daysFromToday(21)))
-        #expect(viewModel.isPrePeriodDay(TestDates.daysFromToday(19)))
+        #expect(viewModel.isPrePeriodDay(TestDates.daysFromToday(17)))
+        #expect(viewModel.isPrePeriodDay(TestDates.daysFromToday(15)))
+        #expect(!viewModel.isPrePeriodDay(TestDates.daysFromToday(14)))
         #expect(!viewModel.isPrePeriodDay(TestDates.daysFromToday(18)))
-        #expect(!viewModel.isPrePeriodDay(TestDates.daysFromToday(22)))
     }
 
     @Test func updateReplacesEarlierData() {
@@ -81,7 +81,7 @@ struct CalendarViewModelTests {
     }
 
     @Test func isPeriodDayIgnoresTimeOfDay() {
-        let evening = TestDates.daysFromToday(22).addingTimeInterval(22 * 3600)
+        let evening = TestDates.daysFromToday(18).addingTimeInterval(22 * 3600)
         #expect(viewModel.isPeriodDay(evening))
     }
 

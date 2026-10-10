@@ -70,10 +70,10 @@ class CalendarViewModel: ObservableObject {
         }
     }
 
-    /// Next period starts a full cycle after the last logged period day.
+    /// Next period starts a full cycle after the last logged period started.
     /// Nothing is predicted until the user has logged a period.
     func calculatePeriodTimes() {
-        guard let lastPeriod = periodDue.lastReportedPeriod(in: reviews),
+        guard let lastPeriod = periodDue.lastPeriodStart(in: reviews),
               let startOfPeriodDay = Calendar.current.date(byAdding: .day, value: periodDue.cycleLength, to: lastPeriod.startOfDay)
         else {
             self.periodDates = []

@@ -163,17 +163,43 @@ struct TrackingStoreTests {
     }
 
     /// Switching tabs calls `load()`. If that happens inside the save delay, the
-    /// refetch replaces the local edit with the server's older copy, so the edit
-    /// vanishes from the UI until the next reload.
+    /// refetch mustn't replace the local edit with the server's older copy.
     @Test func reloadDuringPendingSaveKeepsLocalEdit() async {
-        let repository = SpyRepository()
+        let repository = SpyRepository(reviews: [Fixtures.review(on: today, onPeriod: .no)])
         let store = makeStore(repository, saveDelay: .milliseconds(300))
 
         store.update(today, onFailure: {}) { $0.setAnswer(.yes, for: .onPeriod) }
         await store.load()
 
-        withKnownIssue("TrackingStore.load() overwrites edits that haven't been saved yet") {
-            #expect(store.review(for: today)?.answers[.onPeriod] == .yes)
-        }
+        #expect(store.review(for: today)?.answers[.onPeriod] == .yes)
+        // The pending save still sends the edit, not the server's copy.
+        #expect(await waitUntil { repository.savedReviews.count == 1 })
+        #expect(repository.savedReviews.first?.answers[.onPeriod] == .yes)
+    }
+
+    @Test func reloadAfterSaveFinishesUsesServerCopy() async {
+        let repository = SpyRepository()
+        let store = makeStore(repository)
+
+        store.update(today, onFailure: {}) { $0.journal = "Local" }
+        #expect(await waitUntil { repository.savedReviews.count == 1 })
+        // Let the save task clear its pending entry.
+        try? await Task.sleep(for: .milliseconds(50))
+
+        repository.reviews = [Fixtures.review(on: today, journal: "From server")]
+        await store.load()
+
+        #expect(store.review(for: today)?.journal == "From server")
+    }
+
+    @Test func reloadKeepsOtherDaysFromTheServer() async {
+        let repository = SpyRepository(reviews: [Fixtures.review(on: yesterday, journal: "Server")])
+        let store = makeStore(repository, saveDelay: .seconds(10))
+
+        store.update(today, onFailure: {}) { $0.journal = "Pending" }
+        await store.load()
+
+        #expect(store.review(for: today)?.journal == "Pending")
+        #expect(store.review(for: yesterday)?.journal == "Server")
     }
 }

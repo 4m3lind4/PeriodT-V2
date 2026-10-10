@@ -36,8 +36,10 @@ final class MockPeriodTRepository: IPeriodTRepository {
         return programs.sorted { $0.date < $1.date }
     }
 
+    /// Adding the same program twice (a retry) keeps one copy, like the real repository.
     func addProgram(_ program: ExerciseProgram) async throws {
         try await simulateNetwork()
+        guard !programs.contains(where: { $0.id == program.id }) else { return }
         programs.append(program)
     }
 
@@ -124,20 +126,20 @@ extension MockPeriodTRepository {
         ])
     ]
 
-    /// Period logged on the last 4 days, plus a few non-period days, so the calendar
-    /// shows a joined pill. "Period Due" counts from yesterday, so it reads 27 Days.
+    /// Period logged from 5 to 2 days ago, plus a few non-period days, so the calendar
+    /// shows a joined pill. "Period Due" counts from the period's first day, so it reads 23 Days.
     static let samplePollAnswers: [PollAnswers] = [
         sampleReview(daysFromToday: -6, trained: .yes, onPeriod: .no, emotion: .happy, intensity: 4,
                      journal: "Felt strong on the squats today."),
-        sampleReview(daysFromToday: -5, trained: .yes, onPeriod: .no, emotion: .calm, intensity: 3,
-                     journal: ""),
-        sampleReview(daysFromToday: -4, trained: .no, onPeriod: .yes, emotion: .sad, intensity: 1,
+        sampleReview(daysFromToday: -5, trained: .no, onPeriod: .yes, emotion: .sad, intensity: 1,
                      journal: "Cramps all morning, skipped training."),
-        sampleReview(daysFromToday: -3, trained: .yes, onPeriod: .yes, emotion: .neutral, intensity: 2,
+        sampleReview(daysFromToday: -4, trained: .yes, onPeriod: .yes, emotion: .neutral, intensity: 2,
                      journal: "Light physio session, went okay."),
-        sampleReview(daysFromToday: -2, trained: .no, onPeriod: .yes, emotion: .stressed, intensity: 1,
+        sampleReview(daysFromToday: -3, trained: .no, onPeriod: .yes, emotion: .stressed, intensity: 1,
                      journal: ""),
-        sampleReview(daysFromToday: -1, trained: .yes, onPeriod: .yes, emotion: .calm, intensity: 3,
+        sampleReview(daysFromToday: -2, trained: .yes, onPeriod: .yes, emotion: .neutral, intensity: 2,
+                     journal: "Cramps easing off."),
+        sampleReview(daysFromToday: -1, trained: .yes, onPeriod: .no, emotion: .calm, intensity: 3,
                      journal: "Feeling better, energy coming back.")
     ]
 

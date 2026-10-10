@@ -25,6 +25,9 @@ struct ActiveInProgramView: View {
     @State private var openWorkoutID: Workout.ID?
     @State private var isSaving = false
     @State private var liveActivity = WorkoutLiveActivityController()
+    /// How deep the exercise stack was when this screen showed, so leaving can tell
+    /// a back-out (stack shrank) from pushing a workout or switching tabs.
+    @State private var stackDepth = 0
 
     init(program: ExerciseProgram, repository: IPeriodTRepository) {
         self.program = program
@@ -97,7 +100,16 @@ struct ActiveInProgramView: View {
             }
         }
         // Mirror progress onto the lock screen while the program is open.
-        .onAppear { liveActivity.show(program: program, currentIndex: currentWorkoutIndex) }
+        .onAppear {
+            stackDepth = navigation.exercisePath.count
+            liveActivity.show(program: program, currentIndex: currentWorkoutIndex)
+        }
+        // Backed out without submitting: don't leave the program on the lock screen.
+        .onDisappear {
+            if navigation.exercisePath.count < stackDepth {
+                liveActivity.end()
+            }
+        }
         .onChange(of: currentWorkoutIndex) { _, index in
             liveActivity.show(program: program, currentIndex: index)
         }

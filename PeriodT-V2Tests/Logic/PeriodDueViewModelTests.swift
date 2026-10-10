@@ -15,7 +15,7 @@ struct PeriodDueViewModelTests {
     // MARK: - Last period
 
     @Test func noReviewsMeansNothingLogged() {
-        #expect(viewModel.lastReportedPeriod(in: []) == nil)
+        #expect(viewModel.lastPeriodStart(in: []) == nil)
         #expect(viewModel.daysUntilNextPeriod(in: []) == nil)
         #expect(viewModel.dueText(for: []) == "Not logged")
         #expect(viewModel.phase(in: []) == "Not logged")
@@ -24,17 +24,34 @@ struct PeriodDueViewModelTests {
 
     @Test func onlyNoAnswersCountAsNotLogged() {
         let reviews = [Fixtures.review(on: TestDates.daysFromToday(-1), onPeriod: .no)]
-        #expect(viewModel.lastReportedPeriod(in: reviews) == nil)
+        #expect(viewModel.lastPeriodStart(in: reviews) == nil)
     }
 
-    @Test func lastReportedPeriodIsMostRecentYes() {
+    @Test func separateSingleDaysEachStartAPeriod() {
         let reviews = [
             Fixtures.period(daysAgo: 10),
             Fixtures.period(daysAgo: 3),
             Fixtures.review(on: TestDates.daysFromToday(-1), onPeriod: .no),
             Fixtures.period(daysAgo: 6)
         ]
-        #expect(viewModel.lastReportedPeriod(in: reviews) == TestDates.daysFromToday(-3))
+        #expect(viewModel.lastPeriodStart(in: reviews) == TestDates.daysFromToday(-3))
+    }
+
+    @Test func lastPeriodStartIsFirstDayOfTheLatestRun() {
+        let reviews = (2...6).map { Fixtures.period(daysAgo: $0) }
+            + (30...34).map { Fixtures.period(daysAgo: $0) }
+        #expect(viewModel.lastPeriodStart(in: reviews) == TestDates.daysFromToday(-6))
+        // A five-day period that started 6 days ago is due in 22 days, not 26.
+        #expect(viewModel.dueText(for: reviews) == "22 Days")
+        #expect(viewModel.phase(in: reviews) == "Follicular Phase")
+    }
+
+    @Test func aNoAnswerSplitsPeriods() {
+        let reviews = [Fixtures.period(daysAgo: 5),
+                       Fixtures.review(on: TestDates.daysFromToday(-4), onPeriod: .no),
+                       Fixtures.period(daysAgo: 3),
+                       Fixtures.period(daysAgo: 2)]
+        #expect(viewModel.lastPeriodStart(in: reviews) == TestDates.daysFromToday(-3))
     }
 
     // MARK: - Countdown copy

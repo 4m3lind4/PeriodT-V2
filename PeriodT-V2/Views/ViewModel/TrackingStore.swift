@@ -29,7 +29,11 @@ final class TrackingStore: ObservableObject {
 
     private let repository: IPeriodTRepository
     /// One pending save per day; a new edit restarts that day's wait.
+    /// A day stays here until its save finishes, so `load()` knows not to overwrite it.
     private var pendingSaves: [Date: Task<Void, Never>] = [:]
+    /// Which edit owns each day's pending save, so an older save finishing late
+    /// doesn't clear the entry for a newer one.
+    private var pendingSaveIDs: [Date: UUID] = [:]
     /// Wait before saving, so typing and slider drags send one request, not dozens.
     private let saveDelay: Duration
 
@@ -49,11 +53,16 @@ final class TrackingStore: ObservableObject {
     }
 
     /// Fetches reviews and program completions. Failures are logged and leave
-    /// the current values in place.
+    /// the current values in place. Days with an edit that hasn't saved yet keep
+    /// the local copy, since the server's is older.
     func load() async {
         do {
             let fetched = try await repository.fetchPollAnswers()
-            reviews = Dictionary(fetched.map { ($0.date, $0) }, uniquingKeysWith: { first, _ in first })
+            var loaded = Dictionary(fetched.map { ($0.date, $0) }, uniquingKeysWith: { first, _ in first })
+            for key in pendingSaves.keys {
+                loaded[key] = reviews[key]
+            }
+            reviews = loaded
         } catch {
             Self.logger.error("Failed to load reviews: \(error.localizedDescription)")
         }
@@ -79,25 +88,37 @@ final class TrackingStore: ObservableObject {
         reviews[key] = review
 
         pendingSaves[key]?.cancel()
+        let saveID = UUID()
+        pendingSaveIDs[key] = saveID
         pendingSaves[key] = Task { [repository, saveDelay] in
             try? await Task.sleep(for: saveDelay)
+            // A newer edit replaced this save and will clear the entry itself.
             guard !Task.isCancelled else { return }
+            defer { self.finishSave(for: key, id: saveID) }
             do {
                 // Save whatever is latest by now, not the snapshot from this edit.
                 if let latest = self.reviews[key] {
                     try await repository.savePollAnswers(latest)
                 }
             } catch {
+                // Cancelled mid-request by a newer edit, whose own save will follow.
+                guard !Task.isCancelled else { return }
                 Self.logger.error("Failed to save review for \(key): \(error.localizedDescription)")
                 onFailure()
             }
         }
     }
 
+    private func finishSave(for key: Date, id: UUID) {
+        guard pendingSaveIDs[key] == id else { return }
+        pendingSaveIDs[key] = nil
+        pendingSaves[key] = nil
+    }
+
     /// Hands the latest period start to the home-screen widget so its countdown stays current.
     private func syncPeriodWidget() {
         let periodDue = PeriodDueViewModel()
-        let changed = PeriodCountdownStore.save(lastPeriod: periodDue.lastReportedPeriod(in: allReviews),
+        let changed = PeriodCountdownStore.save(lastPeriod: periodDue.lastPeriodStart(in: allReviews),
                                                 cycleLength: periodDue.cycleLength)
         if changed {
             WidgetCenter.shared.reloadTimelines(ofKind: PeriodCountdownStore.widgetKind)

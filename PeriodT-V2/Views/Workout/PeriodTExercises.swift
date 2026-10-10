@@ -74,7 +74,12 @@ struct PeriodTExercises: View {
             VStack(alignment: .leading, spacing: 12) {
                 ScreenHeader(title: "Today's Program")
 
-                if todaysPrograms.isEmpty {
+                // A failed first load would otherwise look like an empty schedule.
+                if errorMessage != nil && exerciseData.isEmpty {
+                    Text("Couldn't load your programs. Pull down to try again.")
+                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .foregroundStyle(CoreColor.primary.opacity(0.7))
+                } else if todaysPrograms.isEmpty {
                     Text("Rest day - nothing scheduled")
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
                         .foregroundStyle(CoreColor.primary.opacity(0.7))

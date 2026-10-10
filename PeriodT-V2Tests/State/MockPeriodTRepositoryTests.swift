@@ -31,6 +31,14 @@ struct MockPeriodTRepositoryTests {
         #expect(try await repository.fetchWorkouts().map(\.id) == [program.id])
     }
 
+    @Test func addingTheSameProgramTwiceKeepsOneCopy() async throws {
+        let repository = MockPeriodTRepository(programs: [])
+        let program = Fixtures.program(on: TestDates.daysFromToday(1))
+        try await repository.addProgram(program)
+        try await repository.addProgram(program)
+        #expect(try await repository.fetchWorkouts().map(\.id) == [program.id])
+    }
+
     @Test func saveCompletedWorkoutsMakesSetTheFullTickedList() async throws {
         let workouts = [Workout(name: "A", isCompleted: true), Workout(name: "B"), Workout(name: "C")]
         let program = Fixtures.program(on: .now, workouts: workouts)
@@ -91,9 +99,9 @@ struct MockPeriodTRepositoryTests {
         }
     }
 
-    @Test func samplePeriodEndsYesterdaySoDueIn27Days() {
+    @Test func samplePeriodStartedFiveDaysAgoSoDueIn23Days() {
         let reviews = MockPeriodTRepository.samplePollAnswers
-        #expect(PeriodDueViewModel().dueText(for: reviews) == "27 Days")
+        #expect(PeriodDueViewModel().dueText(for: reviews) == "23 Days")
     }
 
     @Test(arguments: Set(MockPeriodTRepository.samplePrograms.flatMap(\.workouts).map(\.name)).sorted())

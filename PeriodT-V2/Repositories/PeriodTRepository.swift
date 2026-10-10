@@ -11,6 +11,7 @@ import Supabase
 struct PeriodTRepository: IPeriodTRepository {
     
     private let client: SupabaseClient
+    private let signIn = AnonymousSignIn()
     
     init(projectURL: URL, publishableKey: String) {
         self.client = SupabaseClient(supabaseURL: projectURL, supabaseKey: publishableKey)
@@ -31,12 +32,15 @@ struct PeriodTRepository: IPeriodTRepository {
     }
     
     /// Saves a program, then its workouts. The database fills in `user_id` from the signed-in user.
+    /// These are two requests, so if the second fails the program row is already saved.
+    /// Both skip rows that already exist, so retrying the same program finishes the job
+    /// instead of failing on a duplicate id.
     func addProgram(_ program: ExerciseProgram) async throws {
         try await signInIfNeeded()
         
         try await client
             .from("exercise_programs")
-            .insert(ProgramRow(program))
+            .upsert(ProgramRow(program), onConflict: "id", ignoreDuplicates: true)
             .execute()
         
         let workoutRows = program.workouts.enumerated().map { index, workout in
@@ -46,7 +50,7 @@ struct PeriodTRepository: IPeriodTRepository {
         
         try await client
             .from("workouts")
-            .insert(workoutRows)
+            .upsert(workoutRows, onConflict: "id", ignoreDuplicates: true)
             .execute()
     }
     
@@ -99,9 +103,26 @@ struct PeriodTRepository: IPeriodTRepository {
     /// Gives this device its own Supabase user the first time, with no login screen.
     /// The session is saved in the Keychain, so later launches reuse the same user.
     private func signInIfNeeded() async throws {
-        if client.auth.currentSession == nil {
-            try await client.auth.signInAnonymously()
+        try await signIn.ensureSignedIn(client)
+    }
+}
+
+/// On first launch several screens load at once. Without this, each would see no
+/// session and create its own anonymous user, splitting the data between them.
+/// Callers that arrive while a sign-in is running wait for that one instead.
+private actor AnonymousSignIn {
+    private var inFlight: Task<Void, Error>?
+
+    func ensureSignedIn(_ client: SupabaseClient) async throws {
+        guard client.auth.currentSession == nil else { return }
+        if let inFlight {
+            return try await inFlight.value
         }
+        let task = Task { _ = try await client.auth.signInAnonymously() }
+        inFlight = task
+        // Cleared either way, so a failed attempt can be retried by the next call.
+        defer { inFlight = nil }
+        try await task.value
     }
 }
 

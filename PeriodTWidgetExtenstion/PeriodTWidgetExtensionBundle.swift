@@ -12,7 +12,6 @@ import SwiftUI
 struct PeriodTWidgetExtensionBundle: WidgetBundle {
     var body: some Widget {
         PeriodTWidgetExtension()
-        PeriodTWidgetExtensionControl()
         WorkoutLiveActivity()
     }
 }

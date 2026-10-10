@@ -42,14 +42,11 @@ enum CyclePhase: String {
         phase(on: Date(), from: answers, cycleLength: cycleLength)
     }
 
-    /// The phase on `day`, counted from the latest period logged on or before it.
+    /// The phase on `day`, counted from the first day of the latest period logged on or before it.
     /// Nil if no period had been logged by then.
     static func phase(on day: Date, from answers: [PollAnswers], cycleLength: Int = 28) -> CyclePhase? {
         let day = day.startOfDay
-        guard let last = answers
-                .filter({ $0.answers[.onPeriod] == .yes && $0.date <= day })
-                .map(\.date)
-                .max(),
+        guard let last = PeriodDueViewModel.latestPeriodStart(in: answers, onOrBefore: day),
               let daysSince = Calendar.current.dateComponents([.day], from: last.startOfDay, to: day).day
         else { return nil }
         // Wrap around if the user is past a full cycle without logging.

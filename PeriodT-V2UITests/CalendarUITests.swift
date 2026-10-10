@@ -19,7 +19,7 @@ final class CalendarUITests: PeriodTUITestCase {
     @MainActor
     func testPeriodDueCountdownShowsFromSampleData() {
         XCTAssertTrue(app.staticTexts["Period Due"].waitForExistence(timeout: timeout))
-        XCTAssertTrue(app.staticTexts["27 Days"].exists)
+        XCTAssertTrue(app.staticTexts["23 Days"].exists)
     }
 
     @MainActor

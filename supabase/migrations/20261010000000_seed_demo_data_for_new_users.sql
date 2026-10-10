@@ -14,7 +14,7 @@ declare
     v_today date := (now() at time zone 'Australia/Sydney')::date;
     -- Period start days (newest first) and how long each lasted. Slightly uneven, like a real cycle.
     -- The latest start is 9 days ago, so today is follicular. The app predicts the next period a
-    -- cycle after the last logged day (5 days ago), so the calendar shows it ~23 days out.
+    -- cycle after that start, so the calendar shows it ~19 days out.
     v_starts date[] := array[v_today - 9, v_today - 37, v_today - 66, v_today - 93];
     v_lengths int[] := array[5, 5, 6, 4];
 

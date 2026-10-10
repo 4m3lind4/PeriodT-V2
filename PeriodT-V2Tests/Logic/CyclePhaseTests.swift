@@ -65,10 +65,19 @@ struct CyclePhaseTests {
 
     @Test func usesLatestPeriodOnOrBeforeTheDay() {
         let logs = (0..<5).map { Fixtures.review(on: TestDates.adding(days: $0, to: periodStart), onPeriod: .yes) }
-        // Last logged day is day 4, so 5 days after start is cycle day 2.
-        #expect(phase(daysAfterStart: 5, logs: logs) == .menstrual)
-        // 14 days after the last logged day (cycle day 15).
-        #expect(phase(daysAfterStart: 4 + 14, logs: logs) == .ovulation)
+        // Cycle days count from the period's first day, not its last logged day.
+        #expect(phase(daysAfterStart: 2, logs: logs) == .menstrual)
+        #expect(phase(daysAfterStart: 5, logs: logs) == .follicular)
+        #expect(phase(daysAfterStart: 13, logs: logs) == .ovulation)
+        #expect(phase(daysAfterStart: 16, logs: logs) == .luteal)
+    }
+
+    @Test func aNewRunOfPeriodDaysStartsANewCycle() {
+        let first = (0..<4).map { Fixtures.review(on: TestDates.adding(days: $0, to: periodStart), onPeriod: .yes) }
+        let second = (27..<31).map { Fixtures.review(on: TestDates.adding(days: $0, to: periodStart), onPeriod: .yes) }
+        // Day 29 after the first start is day 3 of the second period.
+        #expect(phase(daysAfterStart: 29, logs: first + second) == .menstrual)
+        #expect(phase(daysAfterStart: 27 + 5, logs: first + second) == .follicular)
     }
 
     @Test func ignoresPeriodsLoggedAfterTheDay() {

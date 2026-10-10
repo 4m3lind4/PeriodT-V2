@@ -21,6 +21,9 @@ struct AddProgramView: View {
     @State private var exerciseType: ExerciseType = .physio
     @State private var workouts: [Workout] = [Workout(name: "", sets: 3)]
     
+    /// Kept across Save taps, so retrying after a failed save completes the same
+    /// program rather than creating a second one.
+    @State private var programID = UUID()
     @State private var isSaving = false
     @State private var errorMessage: String?
     
@@ -91,6 +94,7 @@ struct AddProgramView: View {
             .filter { !$0.name.isEmpty }
         
         let program = ExerciseProgram(
+            id: programID,
             date: date,
             day: day,
             exerciseDuration: exerciseDuration,

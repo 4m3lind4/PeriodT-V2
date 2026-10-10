@@ -25,8 +25,8 @@ struct CycleRingView: View {
                 .frame(width: 260.0, height: 260)
                 .padding(20.0)
                 .onAppear { updateProgress() }
-                // New poll answers can move the due date.
-                .onChange(of: store.allReviews.count) { _, _ in updateProgress() }
+                // New or edited poll answers can move the due date.
+                .onChange(of: periodDue.cycleProgress(in: store.allReviews)) { _, _ in updateProgress() }
         }
     }
 

@@ -18,10 +18,11 @@ final class HomeUITests: PeriodTUITestCase {
 
     @MainActor
     func testHomeShowsCycleRingFromLoggedPeriod() {
-        // Sample data logs a period ending yesterday: 27 days to go, menstrual phase.
+        // Sample data logs a period that started 5 days ago: 23 days to go, and today
+        // is cycle day 6, the first day of the follicular phase.
         XCTAssertTrue(app.staticTexts["Period in"].waitForExistence(timeout: timeout))
-        XCTAssertTrue(app.staticTexts["27"].exists)
-        XCTAssertTrue(app.staticTexts["Menstrual Phase"].exists)
+        XCTAssertTrue(app.staticTexts["23"].exists)
+        XCTAssertTrue(app.staticTexts["Follicular Phase"].exists)
     }
 
     @MainActor
@@ -101,9 +102,10 @@ final class HomeUITests: PeriodTUITestCase {
     @MainActor
     func testLoggingPeriodOnHomeUpdatesCalendarCountdown() {
         open(.calendar)
-        XCTAssertTrue(app.staticTexts["27 Days"].waitForExistence(timeout: timeout))
+        XCTAssertTrue(app.staticTexts["23 Days"].waitForExistence(timeout: timeout))
 
         open(.home)
+        // Sample period ended two days ago, so logging today starts a new one.
         // Second question is "Were you on your period?".
         let onPeriodYes = app.buttons.matching(identifier: "Yes").element(boundBy: 1)
         scrollTo(onPeriodYes)

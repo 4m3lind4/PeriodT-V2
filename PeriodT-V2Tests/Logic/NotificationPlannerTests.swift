@@ -80,8 +80,8 @@ struct NotificationPlannerTests {
     @Test func consecutivePeriodDaysDontRepeatMenstrual() {
         let reviews = (0..<4).map { Fixtures.review(on: TestDates.adding(days: $0, to: now), onPeriod: .yes) }
         let plan = plan(reviews: reviews)
-        // Phases are counted from the most recent period day (day 4 here).
-        #expect(dates(of: .phaseChange, in: plan).first == at(9, daysAfterNow: 0))
+        // Phases are counted from the period's first day, however many days were logged.
+        #expect(dates(of: .phaseChange, in: plan) == [0, 5, 13, 16, 28, 33].map { at(9, daysAfterNow: $0) })
         #expect(plan.filter { $0.kind == .phaseChange && $0.body == CyclePhase.menstrual.message }.count == 2)
     }
 
@@ -90,6 +90,13 @@ struct NotificationPlannerTests {
     @Test func periodDueSoonAndOverdue() {
         let plan = plan(reviews: [Fixtures.review(on: now, onPeriod: .yes)])
         // Next period predicted 28 days after the last one.
+        #expect(dates(of: .periodDueSoon, in: plan) == [at(9, daysAfterNow: 26)])
+        #expect(dates(of: .periodOverdue, in: plan) == [at(9, daysAfterNow: 31)])
+    }
+
+    @Test func periodRemindersCountFromThePeriodsFirstDay() {
+        let reviews = (0..<5).map { Fixtures.review(on: TestDates.adding(days: $0, to: now), onPeriod: .yes) }
+        let plan = plan(reviews: reviews)
         #expect(dates(of: .periodDueSoon, in: plan) == [at(9, daysAfterNow: 26)])
         #expect(dates(of: .periodOverdue, in: plan) == [at(9, daysAfterNow: 31)])
     }

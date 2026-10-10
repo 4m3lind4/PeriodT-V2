@@ -11,17 +11,31 @@ import Foundation
 struct PeriodDueViewModel {
     var cycleLength = 28
 
-    /// Most recent day the user answered "yes" to being on their period.
-    func lastReportedPeriod(in answers: [PollAnswers]) -> Date? {
-        answers
-            .filter { $0.answers[.onPeriod] == .yes }
-            .map(\.date)
-            .max()
+    /// First day of the user's most recent period, as `startOfDay`. Nil if never logged.
+    func lastPeriodStart(in answers: [PollAnswers]) -> Date? {
+        Self.latestPeriodStart(in: answers)
     }
 
-    /// Last period + cycle length, measured in days from today. Nil if never logged.
+    /// First day of the most recent run of consecutive "yes, on my period" days,
+    /// counting only days on or before `day` when it's given.
+    /// Cycles count from a period's first day, not its last.
+    static func latestPeriodStart(in answers: [PollAnswers], onOrBefore day: Date? = nil) -> Date? {
+        let limit = day?.startOfDay
+        let periodDays = Set(answers
+            .filter { $0.answers[.onPeriod] == .yes }
+            .map(\.date.startOfDay)
+            .filter { periodDay in limit.map { periodDay <= $0 } ?? true })
+        guard var start = periodDays.max() else { return nil }
+        while let previous = Calendar.current.date(byAdding: .day, value: -1, to: start),
+              periodDays.contains(previous) {
+            start = previous
+        }
+        return start
+    }
+
+    /// Last period start + cycle length, measured in days from today. Nil if never logged.
     func daysUntilNextPeriod(in answers: [PollAnswers]) -> Int? {
-        guard let last = lastReportedPeriod(in: answers),
+        guard let last = lastPeriodStart(in: answers),
               let next = Calendar.current.date(byAdding: .day, value: cycleLength, to: last)
         else { return nil }
         return Calendar.current.dateComponents([.day], from: Date().startOfDay, to: next).day

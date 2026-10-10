@@ -28,9 +28,10 @@ final class OfflineUITests: PeriodTUITestCase {
     }
 
     @MainActor
-    func testExerciseShowsRestDayAfterLoading() {
+    func testExerciseShowsLoadErrorInsteadOfRestDay() {
         open(.exercise)
-        XCTAssertTrue(app.staticTexts["Rest day - nothing scheduled"].waitForExistence(timeout: timeout))
+        XCTAssertTrue(app.staticTexts["Couldn't load your programs. Pull down to try again."].waitForExistence(timeout: timeout))
+        XCTAssertFalse(app.staticTexts["Rest day - nothing scheduled"].exists)
         XCTAssertFalse(app.staticTexts["Incoming"].exists)
         XCTAssertFalse(app.staticTexts["Completed"].exists)
     }

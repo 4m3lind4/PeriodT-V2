@@ -101,7 +101,7 @@ struct NotificationPlanner {
     /// "Due soon" before the predicted period, and "log it" if it's a few days late.
     private func periodReminders(reviews: [PollAnswers]) -> [PlannedNotification] {
         let due = PeriodDueViewModel(cycleLength: cycleLength)
-        guard let last = due.lastReportedPeriod(in: reviews) else { return [] }
+        guard let last = due.lastPeriodStart(in: reviews) else { return [] }
         let dueDay = Self.day(cycleLength, after: last.startOfDay)
         let soonDays = Self.dueSoonLeadDays
         return [
