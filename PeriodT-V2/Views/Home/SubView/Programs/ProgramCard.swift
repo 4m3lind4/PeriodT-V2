@@ -9,50 +9,53 @@ import SwiftUI
 
 
 /// Compact program card used in the Home horizontal carousel.
+/// Colour band on top shows the program's status, matching the Exercise tab cards.
 struct ProgramCard: View {
     let program: ExerciseProgram
-    
-    private var cardColor: Color {
-        switch program.exerciseType {
-        case .physio:
-            return CoreColor.primary
-
-        case .conditioningTraining:
-            return CoreColor.secondary
-        }
-    }
-        
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(program.formattedDate)
-                .font(.title3)
+        VStack(alignment: .leading, spacing: 0) {
+            // Status band: completed / current / incoming.
+            program.status.color
+                .frame(height: 20)
 
-            Text("Day \(program.day) | \(program.exerciseType.title) ")
-                .font(.title2)
-                .fontWeight(.bold)
-
-            Spacer()
-
-            Text(
-                "\(program.numberOfExercises) Exercises – " + "\(program.exerciseDuration) Mins"
-            )
-            .font(.subheadline)
+            VStack(alignment: .leading, spacing: 8) {
+                Text(program.formattedDate.uppercased())
+                Text("Day \(program.day)")
+                Text("\(program.numberOfExercises) Exercises - \(program.exerciseDuration) Mins")
+            }
+            .font(.system(size: 18, weight: .semibold, design: .rounded))
+            .foregroundStyle(CoreColor.primary)
+            .padding(.horizontal, 30)
+            .padding(.vertical, 14)
         }
-        .padding(16)
-        .frame(width: 250, height: 130, alignment: .leading)
-        .foregroundStyle(.white)
-        .background(cardColor)
+        .frame(width: 260, alignment: .leading)
+        .background(CoreColor.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
+/// Shown in place of the carousel when nothing is scheduled.
+struct NoProgramsCard: View {
+    var body: some View {
+        Text("No Exercises due!\nEnjoy freedom🎉")
+            .font(.system(size: 18, weight: .semibold, design: .rounded))
+            .multilineTextAlignment(.center)
+            .foregroundStyle(CoreColor.primary)
+            .frame(maxWidth: .infinity, minHeight: 110)
+            .background(CoreColor.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
 #Preview {
-    ProgramCard(
-        
-        program: ExerciseProgram(
-            date: Date(), day: 1, exerciseDuration: 60, numberOfExercises: 4, exerciseType: .physio, workouts: []
+    VStack(spacing: 20) {
+        ProgramCard(
+            program: ExerciseProgram(
+                date: Date(), day: 1, exerciseDuration: 60, numberOfExercises: 6, exerciseType: .physio, workouts: []
+            )
         )
-        
-    )
+        NoProgramsCard()
+            .padding(.horizontal)
+    }
 }
