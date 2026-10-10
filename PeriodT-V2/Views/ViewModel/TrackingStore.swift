@@ -28,10 +28,11 @@ final class TrackingStore: ObservableObject {
     /// One pending save per day; a new edit restarts that day's wait.
     private var pendingSaves: [Date: Task<Void, Never>] = [:]
     /// Wait before saving, so typing and slider drags send one request, not dozens.
-    private let saveDelay: Duration = .milliseconds(600)
+    private let saveDelay: Duration
 
-    init(repository: IPeriodTRepository) {
+    init(repository: IPeriodTRepository, saveDelay: Duration = .milliseconds(600)) {
         self.repository = repository
+        self.saveDelay = saveDelay
     }
 
     var allReviews: [PollAnswers] { Array(reviews.values) }

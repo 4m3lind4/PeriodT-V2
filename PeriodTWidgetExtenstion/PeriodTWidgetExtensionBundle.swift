@@ -13,6 +13,6 @@ struct PeriodTWidgetExtensionBundle: WidgetBundle {
     var body: some Widget {
         PeriodTWidgetExtension()
         PeriodTWidgetExtensionControl()
-        PeriodTWidgetExtensionLiveActivity()
+        WorkoutLiveActivity()
     }
 }

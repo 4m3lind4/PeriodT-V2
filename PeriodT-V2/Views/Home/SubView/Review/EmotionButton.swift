@@ -23,6 +23,8 @@ struct EmotionButton: View {
         .padding(10)
         .background(isSelected ? CoreColor.primary.opacity(0.35) : CoreColor.ringBackground)
         .clipShape(Circle())
+        .accessibilityLabel(emotion.rawValue.capitalized)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

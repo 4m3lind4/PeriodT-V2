@@ -76,6 +76,13 @@
 			);
 			target = 7F944D27306E0E0600DC27BE /* PeriodT-V2 */;
 		};
+		7F9450EE307A3E6400DC27BE /* Exceptions for "PeriodTWidgetExtenstion" folder in "PeriodT-V2" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				WorkoutActivityAttributes.swift,
+			);
+			target = 7F944D27306E0E0600DC27BE /* PeriodT-V2 */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -97,9 +104,10 @@
 			path = "PeriodT-V2UITests";
 			sourceTree = "<group>";
 		};
-		7F944FA23079E0C700DC27BE /* PeriodTWidgetExtenstion */ = {
+		7F9450CD307A3E6400DC27BE /* PeriodTWidgetExtenstion */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				7F9450EE307A3E6400DC27BE /* Exceptions for "PeriodTWidgetExtenstion" folder in "PeriodT-V2" target */,
 				7F944FB33079E0C800DC27BE /* Exceptions for "PeriodTWidgetExtenstion" folder in "PeriodTWidgetExtension" target */,
 			);
 			path = PeriodTWidgetExtenstion;
@@ -149,7 +157,7 @@
 				7F944D2A306E0E0600DC27BE /* PeriodT-V2 */,
 				7F944D38306E0E0800DC27BE /* PeriodT-V2Tests */,
 				7F944D42306E0E0800DC27BE /* PeriodT-V2UITests */,
-				7F944FA23079E0C700DC27BE /* PeriodTWidgetExtenstion */,
+				7F9450CD307A3E6400DC27BE /* PeriodTWidgetExtenstion */,
 				7F944EA73071539100DC27BE /* Frameworks */,
 				7F944D29306E0E0600DC27BE /* Products */,
 			);
@@ -263,7 +271,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				7F944FA23079E0C700DC27BE /* PeriodTWidgetExtenstion */,
+				7F9450CD307A3E6400DC27BE /* PeriodTWidgetExtenstion */,
 			);
 			name = PeriodTWidgetExtension;
 			packageProductDependencies = (

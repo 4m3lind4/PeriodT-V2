@@ -24,6 +24,7 @@ struct ActiveInProgramView: View {
     /// The workout whose set tracker is open.
     @State private var openWorkoutID: Workout.ID?
     @State private var isSaving = false
+    @State private var liveActivity = WorkoutLiveActivityController()
 
     init(program: ExerciseProgram, repository: IPeriodTRepository) {
         self.program = program
@@ -41,6 +42,11 @@ struct ActiveInProgramView: View {
     /// Workouts with every set ticked; this is what gets saved.
     private var completedWorkoutIDs: Set<Workout.ID> {
         Set(program.workouts.filter(isFinished).map(\.id))
+    }
+
+    /// First exercise that isn't finished yet; the last one once everything is done.
+    private var currentWorkoutIndex: Int {
+        program.workouts.firstIndex { !isFinished($0) } ?? max(program.workouts.count - 1, 0)
     }
 
     private func isFinished(_ workout: Workout) -> Bool {
@@ -63,6 +69,7 @@ struct ActiveInProgramView: View {
                     Button {
                         Task {
                             if await submitProgram() {
+                                liveActivity.end()
                                 navigation.exercisePath.append(ExerciseFlow.completed(program))
                             } else {
                                 presentError(.saveFailed(.workout))
@@ -88,6 +95,11 @@ struct ActiveInProgramView: View {
             if let workout = program.workouts.first(where: { $0.id == id }) {
                 WorkoutSetsView(title: title, workout: workout, completedSets: setsBinding(for: id))
             }
+        }
+        // Mirror progress onto the lock screen while the program is open.
+        .onAppear { liveActivity.show(program: program, currentIndex: currentWorkoutIndex) }
+        .onChange(of: currentWorkoutIndex) { _, index in
+            liveActivity.show(program: program, currentIndex: index)
         }
     }
 

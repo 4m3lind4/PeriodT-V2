@@ -8,7 +8,8 @@
 import SwiftUI
 import UserNotifications
 
-/// Lets notifications show as banners even when the app is open.
+/// Lets notifications show as banners even when the app is open,
+/// and opens the matching tab when one is tapped.
 final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
@@ -19,6 +20,15 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
         [.banner, .sound]
+    }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse) async {
+        let userInfo = response.notification.request.content.userInfo
+        if let rawTab = userInfo[NotificationScheduler.tabKey] as? Int,
+           let tab = AppNavigationViewModel.Tab(rawValue: rawTab) {
+            NotificationRouter.shared.pendingTab = tab
+        }
     }
 }
 
@@ -34,9 +44,21 @@ struct PeriodT_V2App: App {
     @StateObject private var store: TrackingStore
 
     init() {
-        let repository: IPeriodTRepository = PeriodTRepository(projectURL: URL(string: "https://mizilxflvxuldksvcvhz.supabase.co")!, publishableKey: "sb_publishable_D12Dbrz6AttqLF-p73xJcA_3Jov0JJx")
+        let repository = Self.makeRepository()
         self.repository = repository
         _store = StateObject(wrappedValue: TrackingStore(repository: repository))
+    }
+
+    /// UI tests launch with `-UITesting` to run against `MockPeriodTRepository` instead of Supabase,
+    /// and add `-UITestingOffline` to make every repository call fail.
+    private static func makeRepository() -> IPeriodTRepository {
+        #if DEBUG
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("-UITesting") {
+            return MockPeriodTRepository(shouldFail: arguments.contains("-UITestingOffline"))
+        }
+        #endif
+        return PeriodTRepository(projectURL: URL(string: "https://mizilxflvxuldksvcvhz.supabase.co")!, publishableKey: "sb_publishable_D12Dbrz6AttqLF-p73xJcA_3Jov0JJx")
     }
 
     var body: some Scene {

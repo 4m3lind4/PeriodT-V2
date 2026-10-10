@@ -82,6 +82,17 @@ struct StepSliderView: View {
             )
             .animation(.snappy(duration: 0.2), value: selectedStep)
         }
+        // The drag gesture isn't reachable with VoiceOver, so expose it as an adjustable control.
+        .accessibilityElement()
+        .accessibilityLabel(title)
+        .accessibilityValue("\(selectedStep + 1) of \(Self.steps)")
+        .accessibilityAdjustableAction { direction in
+            switch direction {
+            case .increment: selectedStep = min(selectedStep + 1, Self.steps - 1)
+            case .decrement: selectedStep = max(selectedStep - 1, 0)
+            @unknown default: break
+            }
+        }
     }
 }
 

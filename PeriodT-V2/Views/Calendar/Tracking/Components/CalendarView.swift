@@ -183,7 +183,16 @@ struct CalendarView: View {
                 
             }
             .buttonStyle(.plain)
+            // The visible label is just the day number, which repeats in every month.
+            .accessibilityLabel(day.formatted(date: .complete, time: .omitted))
+            .accessibilityIdentifier(Self.dayIdentifier(for: day))
         }
+    }
+
+    /// Stable identifier for a day cell, e.g. "calendar-day-2026-10-07".
+    static func dayIdentifier(for day: Date) -> String {
+        let parts = Calendar.current.dateComponents([.year, .month, .day], from: day)
+        return String(format: "calendar-day-%04d-%02d-%02d", parts.year ?? 0, parts.month ?? 0, parts.day ?? 0)
     }
 
     /// Lavender circle marking today. Logged period days are drawn by

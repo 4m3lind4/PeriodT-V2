@@ -9,72 +9,115 @@ import ActivityKit
 import WidgetKit
 import SwiftUI
 
-struct PeriodTWidgetExtensionAttributes: ActivityAttributes {
-    public struct ContentState: Codable, Hashable {
-        // Dynamic stateful properties about your activity go here!
-        var emoji: String
-    }
-
-    // Fixed non-changing properties about your activity go here!
-    var name: String
-}
-
-struct PeriodTWidgetExtensionLiveActivity: Widget {
+struct WorkoutLiveActivity: Widget {
     var body: some WidgetConfiguration {
-        ActivityConfiguration(for: PeriodTWidgetExtensionAttributes.self) { context in
-            // Lock screen/banner UI goes here
-            VStack {
-                Text("Hello \(context.state.emoji)")
+        ActivityConfiguration(for: WorkoutActivityAttributes.self) { context in
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    PeriodTLogo(size: 24)
+                    Text("PeriodT")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Text("Workout in progress!")
+                    .font(.headline)
+                Text("You're at \(context.state.currentExerciseName)\(detailSuffix(context.state.detail))")
+                Text("Never give up! Never what? 🗣️")
+                    .font(.subheadline)
+                ProgressDots(current: context.state.currentIndex, total: context.attributes.totalExercises)
+                    .padding(.top, 4)
             }
-            .activityBackgroundTint(Color.cyan)
-            .activitySystemActionForegroundColor(Color.black)
-
+            .padding()
+            .activityBackgroundTint(Color(white: 0.88))
+            .activitySystemActionForegroundColor(.black)
         } dynamicIsland: { context in
             DynamicIsland {
-                // Expanded UI goes here.  Compose the expanded UI through
-                // various regions, like leading/trailing/center/bottom
                 DynamicIslandExpandedRegion(.leading) {
-                    Text("Leading")
+                    PeriodTLogo(size: 28)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    Text("Trailing")
+                    Text("\(context.state.currentIndex + 1)/\(context.attributes.totalExercises)")
+                }
+                DynamicIslandExpandedRegion(.center) {
+                    Text(context.state.currentExerciseName)
+                        .lineLimit(1)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    Text("Bottom \(context.state.emoji)")
-                    // more content
+                    ProgressDots(current: context.state.currentIndex, total: context.attributes.totalExercises)
                 }
             } compactLeading: {
-                Text("L")
+                PeriodTLogo(size: 20)
             } compactTrailing: {
-                Text("T \(context.state.emoji)")
+                Text("\(context.state.currentIndex + 1)/\(context.attributes.totalExercises)")
             } minimal: {
-                Text(context.state.emoji)
+                PeriodTLogo(size: 20)
             }
-            .widgetURL(URL(string: "http://www.apple.com"))
-            .keylineTint(Color.red)
+            .keylineTint(WorkoutActivityColor.accent)
+        }
+    }
+
+    private func detailSuffix(_ detail: String) -> String {
+        detail.isEmpty ? "" : " - \(detail)"
+    }
+}
+
+private enum WorkoutActivityColor {
+    static let accent = Color(red: 0.86, green: 0.44, blue: 0.59)
+}
+
+
+private struct PeriodTLogo: View {
+    let size: CGFloat
+
+    var body: some View {
+        Image("PeriodTLogo")
+            .resizable()
+            .scaledToFit()
+            .frame(width: size, height: size)
+            .clipShape(RoundedRectangle(cornerRadius: size * 0.22, style: .continuous))
+    }
+}
+
+struct ProgressDots: View {
+    let current: Int
+    let total: Int
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(0..<total, id: \.self) { i in
+                Circle()
+                    .fill(i <= current ? WorkoutActivityColor.accent : .clear)
+                    .strokeBorder(i <= current ? WorkoutActivityColor.accent : .white, lineWidth: 4)
+                    .frame(width: 22, height: 22)
+                if i < total - 1 {
+                    Rectangle()
+                        .fill(i < current ? WorkoutActivityColor.accent : .clear)
+                        .frame(height: 4)
+                }
+            }
         }
     }
 }
 
-extension PeriodTWidgetExtensionAttributes {
-    fileprivate static var preview: PeriodTWidgetExtensionAttributes {
-        PeriodTWidgetExtensionAttributes(name: "World")
+extension WorkoutActivityAttributes {
+    fileprivate static var preview: WorkoutActivityAttributes {
+        WorkoutActivityAttributes(programName: "Day 1", totalExercises: 4)
     }
 }
 
-extension PeriodTWidgetExtensionAttributes.ContentState {
-    fileprivate static var smiley: PeriodTWidgetExtensionAttributes.ContentState {
-        PeriodTWidgetExtensionAttributes.ContentState(emoji: "😀")
-     }
-     
-     fileprivate static var starEyes: PeriodTWidgetExtensionAttributes.ContentState {
-         PeriodTWidgetExtensionAttributes.ContentState(emoji: "🤩")
-     }
+extension WorkoutActivityAttributes.ContentState {
+    fileprivate static var first: Self {
+        .init(currentExerciseName: "Goblet Squat", detail: "3 × 10", currentIndex: 0)
+    }
+
+    fileprivate static var third: Self {
+        .init(currentExerciseName: "Rowing Machine", detail: "", currentIndex: 2)
+    }
 }
 
-#Preview("Notification", as: .content, using: PeriodTWidgetExtensionAttributes.preview) {
-   PeriodTWidgetExtensionLiveActivity()
+#Preview("Notification", as: .content, using: WorkoutActivityAttributes.preview) {
+    WorkoutLiveActivity()
 } contentStates: {
-    PeriodTWidgetExtensionAttributes.ContentState.smiley
-    PeriodTWidgetExtensionAttributes.ContentState.starEyes
+    WorkoutActivityAttributes.ContentState.first
+    WorkoutActivityAttributes.ContentState.third
 }

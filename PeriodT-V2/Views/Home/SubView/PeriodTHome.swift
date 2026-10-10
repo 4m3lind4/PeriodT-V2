@@ -57,6 +57,7 @@ struct PeriodTHome: View {
         // Keeps Submit clear of the floating tab bar.
         .contentMargins(.bottom, 100, for: .scrollContent)
         }
+        .task { await load() }
 
     }
     

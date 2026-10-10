@@ -40,6 +40,7 @@ struct QuestionCardView: View {
                         .padding(.vertical, 15)
                         .background(selectedAnswer == .yes ? Color.orange.opacity(0.3) : Color.clear)
                 }
+                .accessibilityAddTraits(selectedAnswer == .yes ? .isSelected : [])
 
                 Rectangle()
                     .fill(Color.white.opacity(0.6))
@@ -55,6 +56,7 @@ struct QuestionCardView: View {
                         .padding(.vertical, 15)
                         .background(selectedAnswer == .no ? Color.orange.opacity(0.3) : Color.clear)
                 }
+                .accessibilityAddTraits(selectedAnswer == .no ? .isSelected : [])
             }
             .background(CoreColor.ringBackground)
             
