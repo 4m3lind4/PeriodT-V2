@@ -36,10 +36,9 @@ struct ContentView: View {
         }
         TabView(selection: $navigation.selectedTab) {
             // Placeholder Home until a dedicated home screen is ported.
-            ScrollView {
-                PeriodTHome(repository: repository)
-                    .padding()
-            }
+            // PeriodTHome scrolls itself (so its Submit can jump back to the top).
+            PeriodTHome(repository: repository)
+                .padding(.horizontal)
                 .errorCardHost()
                 .tabItem {
                     Image(systemName: "clock")

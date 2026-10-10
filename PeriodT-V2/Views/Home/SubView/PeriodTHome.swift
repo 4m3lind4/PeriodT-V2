@@ -15,11 +15,16 @@ struct PeriodTHome: View {
 
     private let viewModel = WeekSelectorViewModel()
 
+    /// Scroll target for Submit to jump back to.
+    private let topID = "home-top"
+
     var body: some View {
+        ScrollViewReader { proxy in
         ScrollView{
             VStack(spacing:1){
                 greetingHeader
                     .padding(.horizontal,10)
+                    .id(topID)
 // MARK: ------ COMPLIATION OF ITEMS
 
                 WeekSelector()
@@ -35,10 +40,23 @@ struct PeriodTHome: View {
                 Spacer()
                 HomeQuestionaireView()
 
+                // Answers already save as they're picked; Submit just confirms
+                // and takes the user back up to the top of Home.
+                Button {
+                    withAnimation(.easeInOut) {
+                        proxy.scrollTo(topID, anchor: .top)
+                    }
+                } label: {
+                    PrimaryButtonLabel(title: "Submit")
+                }
+                .padding(.top, 16)
             }
             .padding(10)
         }
-        
+        // Keeps Submit clear of the floating tab bar.
+        .contentMargins(.bottom, 100, for: .scrollContent)
+        }
+
     }
     
 

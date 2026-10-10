@@ -22,6 +22,9 @@ struct LottieView: UIViewRepresentable {
         view.loopMode = loopMode
         view.animationSpeed = speed
         view.backgroundBehavior = .pauseAndRestore
+        // Let SwiftUI's .frame shrink it; otherwise it insists on the animation file's own size.
+        view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        view.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         view.play { finished in
             if finished { onFinished?() }
         }

@@ -62,7 +62,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		7F944FB33079E0C800DC27BE /* Exceptions for "PeriodTWidgetExtension" folder in "PeriodTWidgetExtension" target */ = {
+		7F944FB33079E0C800DC27BE /* Exceptions for "PeriodTWidgetExtenstion" folder in "PeriodTWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -87,12 +87,12 @@
 			path = "PeriodT-V2UITests";
 			sourceTree = "<group>";
 		};
-		7F944FA23079E0C700DC27BE /* PeriodTWidgetExtension */ = {
+		7F944FA23079E0C700DC27BE /* PeriodTWidgetExtenstion */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				7F944FB33079E0C800DC27BE /* Exceptions for "PeriodTWidgetExtension" folder in "PeriodTWidgetExtension" target */,
+				7F944FB33079E0C800DC27BE /* Exceptions for "PeriodTWidgetExtenstion" folder in "PeriodTWidgetExtension" target */,
 			);
-			path = PeriodTWidgetExtension;
+			path = PeriodTWidgetExtenstion;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -139,7 +139,7 @@
 				7F944D2A306E0E0600DC27BE /* PeriodT-V2 */,
 				7F944D38306E0E0800DC27BE /* PeriodT-V2Tests */,
 				7F944D42306E0E0800DC27BE /* PeriodT-V2UITests */,
-				7F944FA23079E0C700DC27BE /* PeriodTWidgetExtension */,
+				7F944FA23079E0C700DC27BE /* PeriodTWidgetExtenstion */,
 				7F944EA73071539100DC27BE /* Frameworks */,
 				7F944D29306E0E0600DC27BE /* Products */,
 			);
@@ -253,7 +253,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				7F944FA23079E0C700DC27BE /* PeriodTWidgetExtension */,
+				7F944FA23079E0C700DC27BE /* PeriodTWidgetExtenstion */,
 			);
 			name = PeriodTWidgetExtension;
 			packageProductDependencies = (
@@ -673,7 +673,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7LYGPBJD5C;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = PeriodTWidgetExtension/Info.plist;
+				INFOPLIST_FILE = PeriodTWidgetExtenstion/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = PeriodTWidgetExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -703,7 +703,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7LYGPBJD5C;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = PeriodTWidgetExtension/Info.plist;
+				INFOPLIST_FILE = PeriodTWidgetExtenstion/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = PeriodTWidgetExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (

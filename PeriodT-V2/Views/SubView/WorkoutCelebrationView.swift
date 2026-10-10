@@ -18,18 +18,20 @@ struct WorkoutCelebrationView: View {
             CoreColor.primary
                 .ignoresSafeArea()
 
-            LottieView(animationName: "Confestti", speed: 1.2, onFinished: onFinished)
-                .ignoresSafeArea()
-
+    
             VStack(spacing: 6) {
-                Text("Workout Logged!")
+                LottieView(animationName: "Confestti", speed: 1.2, onFinished: onFinished)
+                    .frame(width: 550, height: 550)
+                    .padding(.bottom, 12)
+
+                Text("Workout Logged")
                     .font(.system(size: 34, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
-                Text("Nice work today")
-                    .font(.system(size: 18, weight: .medium, design: .rounded))
+                Text("Nice work!")
+                    .font(.system(size: 20, weight: .medium, design: .rounded))
                     .foregroundColor(CoreColor.ringBackground)
             }
-            .padding(.bottom, 40)
+            .padding(.bottom, 60)
         }
         .transition(.opacity)
     }
