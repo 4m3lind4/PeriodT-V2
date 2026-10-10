@@ -7,13 +7,12 @@
 
 import SwiftUI
 
-/// Wraps the calendar in a purple fade toward the bottom of the screen.
-/// The gradient ignores touches so the days underneath stay tappable.
+/// Purple fade toward the bottom of the screen, laid over the calendar tab.
+/// Pinned to the screen (not the calendar), so it stays the same however
+/// many months there are. Ignores touches so the days underneath stay tappable.
 struct GradientOverlayView: View {
     var body: some View {
         ZStack {
-            
-            CalendarView(calendarViewModel: CalendarViewModel())
             LinearGradient(
                 stops: [
                     .init(color: .clear, location: 0.35),
@@ -38,5 +37,4 @@ struct GradientOverlayView: View {
 
 #Preview {
     GradientOverlayView()
-        .errorCardHost()
 }

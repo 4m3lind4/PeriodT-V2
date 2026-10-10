@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// Scrolling 3-month calendar grid. Highlights predicted period days,
+/// Scrolling calendar grid covering the past six months and the next two. Highlights predicted period days,
 /// logged period days, and days where a program was submitted.
 struct CalendarView: View {
     @ObservedObject var calendarViewModel: CalendarViewModel
@@ -71,27 +71,37 @@ struct CalendarView: View {
         count: 7
     )
 
-    /// This month plus the next two.
-    private var monthsArray: [Date] {
-        (0..<3).compactMap { monthOffset in
-            Calendar.current.date(
-                byAdding: .month,
-                value: monthOffset,
-                to: date
-            )
-        }
+    /// Months relative to this one: the last six, this month, and the next two.
+    private let monthOffsets = Array(-6...2)
+
+    /// Scroll ID just above the current month. `PeriodTTracking` scrolls here on appear,
+    /// so the calendar opens on today rather than six months ago.
+    static let currentMonthID = "calendar-current-month"
+
+    private func month(at offset: Int) -> Date? {
+        Calendar.current.date(byAdding: .month, value: offset, to: date)
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 30) {
-                ForEach(monthsArray, id: \.self) { month in
+        // No ScrollView of its own: it sits inside PeriodTTracking's, which does the
+        // scrolling (a nested one just grows to full height and never scrolls).
+        VStack(spacing: 30) {
+            ForEach(monthOffsets, id: \.self) { offset in
+                if let month = month(at: offset) {
                     monthCalendar(for: month)
+                        // Scroll target sits at the bottom of last month, so landing on it
+                        // leaves this month's title in view instead of tucked under the top edge.
+                        .overlay(alignment: .bottom) {
+                            if offset == -1 {
+                                Color.clear
+                                    .frame(height: 1)
+                                    .id(Self.currentMonthID)
+                            }
+                        }
                 }
             }
-            .padding()
         }
-        .scrollIndicators(.hidden)
+        .padding()
         .sheet(item: $selectedDay) { selected in
             DayDetailSheet(day: selected.date)
         }

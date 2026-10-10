@@ -10,7 +10,7 @@ import SwiftUI
 import WidgetKit
 
 struct PeriodTWidgetExtensionControl: ControlWidget {
-    static let kind: String = "Jessica.a.m.PeriodTWidgetExtension"
+    static let kind: String = "Jessica.a.m.PeriodT-V2.PeriodTWidgetExtension"
 
     var body: some ControlWidgetConfiguration {
         AppIntentControlConfiguration(
