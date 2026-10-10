@@ -9,6 +9,8 @@ import SwiftUI
 
 /// "Great Job" screen shown after a program is submitted.
 struct ProgramCompletedView: View {
+    let program: ExerciseProgram
+
     @EnvironmentObject private var navigation: AppNavigationViewModel
 
     @State private var informCoach: ReviewAnswer?
@@ -24,14 +26,13 @@ struct ProgramCompletedView: View {
                     .font(Font.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
                 PostWorkoutIntensity()
-                WorkoutJournalView()
+                WorkoutJournalView(program: program)
 
                 QuestionCardView(
                     selectedAnswer: $informCoach,
                     question: "Would you like to inform your coach about your set?",
                     color: CoreColor.accent
                 )
-                .padding(.horizontal, 8)
 
                 Button {
                     withAnimation(.easeInOut(duration: 0.3)) {
@@ -59,7 +60,8 @@ struct ProgramCompletedView: View {
 
 #Preview {
     NavigationStack {
-        ProgramCompletedView()
+        ProgramCompletedView(program: MockPeriodTRepository.samplePrograms[0])
     }
     .environmentObject(AppNavigationViewModel())
+    .previewTrackingStore()
 }

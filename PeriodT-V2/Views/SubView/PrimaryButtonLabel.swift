@@ -15,7 +15,7 @@
 
 import SwiftUI
 
-/// Large rounded call-to-action label (Submit / Start).
+/// Rounded call-to-action label (Submit / Start / Save), sized to match the Journal entry Save.
 /// Wrap it in a `Button` or `NavigationLink` to make it tappable.
 struct PrimaryButtonLabel: View {
     enum Style {
@@ -30,12 +30,12 @@ struct PrimaryButtonLabel: View {
 
     var body: some View {
         Text(title)
-            .font(.system(size: 26, weight: .bold, design: .rounded))
+            .font(.system(size: 16, weight: .semibold, design: .rounded))
             .foregroundStyle(style == .light ? CoreColor.primary : .white)
             .padding(.horizontal, 40)
-            .padding(.vertical, 12)
+            .padding(.vertical, 10)
             .background(style == .light ? CoreColor.ringBackground : CoreColor.primary)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
             .shadow(color: .black.opacity(0.2), radius: 0, y: 3)
     }
 }

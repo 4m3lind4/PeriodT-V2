@@ -33,6 +33,15 @@ struct ReviewSummaryView: View {
         if !journal.isEmpty {
             items.append(SummaryItem(title: "Emotion Journal", value: journal))
         }
+        // One card per program journal; numbered when a day has more than one.
+        let workoutJournals = review.workoutJournals.values
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .sorted()
+        for (index, text) in workoutJournals.enumerated() {
+            let title = workoutJournals.count > 1 ? "Workout Journal \(index + 1)" : "Workout Journal"
+            items.append(SummaryItem(title: title, value: text))
+        }
         return items
     }
 

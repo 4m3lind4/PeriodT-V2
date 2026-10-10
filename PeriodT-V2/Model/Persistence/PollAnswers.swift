@@ -30,6 +30,29 @@ struct PollAnswers: Codable, Equatable {
         set { rawEmotion = newValue?.rawValue }
     }
 
+    /// Workout journals from the completed-program screen, one per program,
+    /// separate from the emotional `journal`. Kept inside the `answers` jsonb as
+    /// "workout_journal:<program id>" so no new column is needed; `answers` below skips these keys.
+    var workoutJournals: [UUID: String] {
+        var result: [UUID: String] = [:]
+        for (key, value) in rawAnswers where key.hasPrefix(Self.workoutJournalPrefix) {
+            if let id = UUID(uuidString: String(key.dropFirst(Self.workoutJournalPrefix.count))) {
+                result[id] = value
+            }
+        }
+        return result
+    }
+
+    func workoutJournal(for programID: UUID) -> String {
+        rawAnswers[Self.workoutJournalPrefix + programID.uuidString] ?? ""
+    }
+
+    mutating func setWorkoutJournal(_ text: String, for programID: UUID) {
+        rawAnswers[Self.workoutJournalPrefix + programID.uuidString] = text
+    }
+
+    private static let workoutJournalPrefix = "workout_journal:"
+
     /// Typed view of `rawAnswers`; unknown keys/values are skipped.
     var answers: [PollQuestionKind: ReviewAnswer] {
         var result: [PollQuestionKind: ReviewAnswer] = [:]

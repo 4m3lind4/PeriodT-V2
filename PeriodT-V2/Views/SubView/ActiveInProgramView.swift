@@ -63,7 +63,7 @@ struct ActiveInProgramView: View {
                     Button {
                         Task {
                             if await submitProgram() {
-                                navigation.exercisePath.append(ExerciseFlow.completed)
+                                navigation.exercisePath.append(ExerciseFlow.completed(program))
                             } else {
                                 presentError(.saveFailed(.workout))
                             }

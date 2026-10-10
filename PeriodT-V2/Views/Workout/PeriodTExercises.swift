@@ -57,8 +57,8 @@ struct PeriodTExercises: View {
                 // Pushed by ActiveInProgramView after a successful submit.
                 .navigationDestination(for: ExerciseFlow.self) { step in
                     switch step {
-                    case .completed:
-                        ProgramCompletedView()
+                    case .completed(let program):
+                        ProgramCompletedView(program: program)
                     }
                 }
         }

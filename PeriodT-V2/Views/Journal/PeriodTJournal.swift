@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Journal tab: the user's goals, then their journal entries newest first.
-/// Entries are the daily reviews (from `TrackingStore`) that have journal text.
+/// Each day can have two entries: Home's emotional journal and the workout journal.
 struct PeriodTJournal: View {
     @EnvironmentObject private var store: TrackingStore
 
@@ -20,16 +20,37 @@ struct PeriodTJournal: View {
 
     @State private var isAddingGoal = false
     @State private var newGoalText = ""
-    @State private var entryDay: SelectedDay?
+    @State private var openEntry: JournalEntry?
 
     /// Items shown per section before "View More".
     private let previewCount = 2
 
-    /// Days with journal text, most recent first.
-    private var entries: [PollAnswers] {
-        store.allReviews
-            .filter { !$0.journal.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-            .sorted { $0.date > $1.date }
+    /// Every non-empty journal, most recent first; workout entries before emotional on the same day.
+    private var entries: [JournalEntry] {
+        let all: [JournalEntry] = store.allReviews.flatMap(entries(in:))
+        return all.sorted { lhs, rhs in
+            lhs.date != rhs.date ? lhs.date > rhs.date : lhs.type == .workout && rhs.type != .workout
+        }
+    }
+
+    /// The day's emotional journal plus one entry per program journal.
+    private func entries(in review: PollAnswers) -> [JournalEntry] {
+        var result: [JournalEntry] = []
+        for (programID, text) in review.workoutJournals where !Self.isBlank(text) {
+            let program = store.programs.first { $0.id == programID }
+            result.append(JournalEntry(date: review.date, type: .workout, text: text,
+                                       programID: programID,
+                                       programTitle: program.map { "\($0.exerciseType.title) Day \($0.day)" }))
+        }
+        if !Self.isBlank(review.journal) {
+            result.append(JournalEntry(date: review.date, type: .emotional, text: review.journal,
+                                       emotion: review.emotion))
+        }
+        return result
+    }
+
+    private static func isBlank(_ text: String) -> Bool {
+        text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     var body: some View {
@@ -50,9 +71,8 @@ struct PeriodTJournal: View {
 
                 sectionTitle("Entries")
                     .padding(.top, 8)
-                // Journal text lives on the daily review, so a new entry is today's review.
                 AddCircleButton(label: "Add new entry") {
-                    entryDay = SelectedDay(id: Date().startOfDay)
+                    openEntry = JournalEntry(date: Date().startOfDay, type: .emotional, text: "")
                 }
 
                 if entries.isEmpty {
@@ -60,9 +80,9 @@ struct PeriodTJournal: View {
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
                         .foregroundStyle(CoreColor.primary.opacity(0.7))
                 }
-                ForEach(showAllEntries ? entries : Array(entries.prefix(previewCount)), id: \.date) { entry in
+                ForEach(showAllEntries ? entries : Array(entries.prefix(previewCount)), id: \.id) { entry in
                     JournalEntryCard(entry: entry)
-                        .onTapGesture { entryDay = SelectedDay(id: entry.date) }
+                        .onTapGesture { openEntry = entry }
                 }
                 if entries.count > previewCount {
                     viewMoreButton(isOn: $showAllEntries)
@@ -73,8 +93,8 @@ struct PeriodTJournal: View {
         // Keeps the last card clear of the tab bar.
         .contentMargins(.bottom, 100, for: .scrollContent)
         .background(Color.white.ignoresSafeArea())
-        .sheet(item: $entryDay) { selected in
-            DayDetailSheet(day: selected.date)
+        .sheet(item: $openEntry) { entry in
+            JournalEntrySheet(day: entry.date, initialType: entry.type, programID: entry.programID)
         }
         .alert("New goal", isPresented: $isAddingGoal) {
             TextField("e.g. Stretch every morning", text: $newGoalText)
@@ -162,11 +182,22 @@ private struct GoalCard: View {
 
 // MARK: - Entries
 
+/// One journal (emotional or workout) for one day.
+struct JournalEntry: Identifiable {
+    let date: Date
+    let type: JournalType
+    let text: String
+    var emotion: Emotion?
+    /// Set for workout entries: which program the journal belongs to.
+    var programID: UUID?
+    var programTitle: String?
+
+    var id: String { "\(date.timeIntervalSince1970)-\(type.rawValue)-\(programID?.uuidString ?? "")" }
+}
+
 /// Date and tags above a card with the mood as title and a one-line preview.
 private struct JournalEntryCard: View {
-    let entry: PollAnswers
-
-    private var trained: Bool { entry.answers[.trained] == .yes }
+    let entry: JournalEntry
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -174,15 +205,15 @@ private struct JournalEntryCard: View {
                 Text("\(entry.date.formatted(.dateTime.day())) of \(entry.date.formatted(.dateTime.month(.wide)))")
                     .font(.system(size: 20, design: .rounded))
                 Spacer()
-                if trained { tag("Workout", color: CoreColor.primary) }
-                if entry.emotion != nil { tag("Emotional", color: CoreColor.accent) }
+                // Pink for workout journals, orange for emotional ones.
+                tag(entry.type.title, color: entry.type.color)
             }
             .foregroundStyle(CoreColor.primary)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(entry.emotion?.rawValue.capitalized ?? "Journal")
+                Text(entry.emotion?.rawValue.capitalized ?? entry.programTitle ?? "\(entry.type.title) Journal")
                     .font(.system(size: 20, weight: .bold, design: .rounded))
-                Text(entry.journal)
+                Text(entry.text)
                     .font(.system(size: 18, design: .rounded))
                     .lineLimit(1)
             }

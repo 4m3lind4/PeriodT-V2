@@ -9,5 +9,6 @@ import Foundation
 
 /// Steps in the post-program flow that are pushed onto the exercise stack.
 enum ExerciseFlow: Hashable {
-    case completed
+    /// The "Great Job" screen for the program that was just submitted.
+    case completed(ExerciseProgram)
 }
