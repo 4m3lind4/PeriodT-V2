@@ -23,3 +23,15 @@ struct PollQuestion: Identifiable {
 
     var id: PollQuestionKind { kind }
 }
+
+extension PollQuestionKind {
+    /// Compact heading used on the calendar's review summary.
+    var summaryTitle: String {
+        switch self {
+        case .trained: "Did you practice today?"
+        case .onPeriod: "Were you on your period?"
+        case .informCoachPeriod: "Inform coach about period?"
+        case .informCoachWorkout: "Update coach about workout?"
+        }
+    }
+}

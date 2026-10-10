@@ -21,6 +21,8 @@ final class TrackingStore: ObservableObject {
     @Published private(set) var reviews: [Date: PollAnswers] = [:]
     /// Days with a program that has at least one ticked workout (calendar dots).
     @Published private(set) var completedProgramDays: Set<Date> = []
+    /// Every program the user can see, for showing a day's workout in the calendar sheet.
+    @Published private(set) var programs: [ExerciseProgram] = []
 
     private let repository: IPeriodTRepository
     /// One pending save per day; a new edit restarts that day's wait.
@@ -38,6 +40,10 @@ final class TrackingStore: ObservableObject {
         reviews[day.startOfDay]
     }
 
+    func programs(on day: Date) -> [ExerciseProgram] {
+        programs.filter { Calendar.current.isDate($0.date, inSameDayAs: day) }
+    }
+
     /// Fetches reviews and program completions. Failures are logged and leave
     /// the current values in place.
     func load() async {
@@ -49,6 +55,7 @@ final class TrackingStore: ObservableObject {
         }
         do {
             let programs = try await repository.fetchWorkouts()
+            self.programs = programs
             completedProgramDays = Set(programs
                 .filter { $0.workouts.contains(where: \.isCompleted) }
                 .map { $0.date.startOfDay })

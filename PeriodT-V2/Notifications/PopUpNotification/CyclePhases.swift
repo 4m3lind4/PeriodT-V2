@@ -39,8 +39,18 @@ enum CyclePhase: String {
 
     /// Works out the current phase from logged reviews. Returns nil if no period has been logged.
     static func current(from answers: [PollAnswers], cycleLength: Int = 28) -> CyclePhase? {
-        guard let last = PeriodDueViewModel().lastReportedPeriod(in: answers),
-              let daysSince = Calendar.current.dateComponents([.day], from: last.startOfDay, to: Date().startOfDay).day
+        phase(on: Date(), from: answers, cycleLength: cycleLength)
+    }
+
+    /// The phase on `day`, counted from the latest period logged on or before it.
+    /// Nil if no period had been logged by then.
+    static func phase(on day: Date, from answers: [PollAnswers], cycleLength: Int = 28) -> CyclePhase? {
+        let day = day.startOfDay
+        guard let last = answers
+                .filter({ $0.answers[.onPeriod] == .yes && $0.date <= day })
+                .map(\.date)
+                .max(),
+              let daysSince = Calendar.current.dateComponents([.day], from: last.startOfDay, to: day).day
         else { return nil }
         // Wrap around if the user is past a full cycle without logging.
         let cycleDay = (daysSince % cycleLength) + 1

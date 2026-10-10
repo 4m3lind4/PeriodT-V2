@@ -12,6 +12,8 @@ import SwiftUI
 struct ExpandableProgramCard: View {
     let program: ExerciseProgram
     @Binding var expandedProgramID: ExerciseProgram.ID?
+    /// Off where there's no exercise NavigationStack to push onto (e.g. the calendar sheet).
+    var showsStart = true
 
     private var isExpanded: Bool { expandedProgramID == program.id }
 
@@ -95,11 +97,13 @@ struct ExpandableProgramCard: View {
                 }
             }
 
-            // Pushes onto the NavigationStack owned by PeriodTExercises.
-            NavigationLink(value: program) {
-                PrimaryButtonLabel(title: "Start", style: .filled)
+            if showsStart {
+                // Pushes onto the NavigationStack owned by PeriodTExercises.
+                NavigationLink(value: program) {
+                    PrimaryButtonLabel(title: "Start", style: .filled)
+                }
+                .padding(.top, 12)
             }
-            .padding(.top, 12)
         }
         // Indent matches the header text, which sits past the status stripe.
         .padding(.leading, stripeWidth + (isPhysio ? physioWidth : 0) + 16)
