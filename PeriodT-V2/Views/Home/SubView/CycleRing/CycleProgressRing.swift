@@ -12,8 +12,11 @@ import SwiftUI
 /// a "period" marker at the start, and a "user" marker at the current progress.
 struct CycleProgressRing: View {
     @Binding var progress: Float
+    /// Days until the next period; nil when no period has been logged.
+    var daysUntilPeriod: Int?
+    var phase: String
     private let strokeWidth: CGFloat = 32.0
-    // 270° = 12 o'clock, so the ring starts at the top.
+
     private let startDegrees: Double = 270.0
 
     /// Converts an angle (degrees) into a point on the ring's circumference.
@@ -106,17 +109,28 @@ struct CycleProgressRing: View {
     /// Days-until-period countdown and current phase, shown inside the ring.
     private var centerLabel: some View {
         VStack {
-            Text("Period in")
-                .font(.title3)
-            // Number of days remaining
-            Text("7")
-                .font(.largeTitle)
-                .bold()
+            if let days = daysUntilPeriod, days > 0 {
+                Text("Period in")
+                    .font(.title3)
+                // Number of days remaining
+                Text("\(days)")
+                    .font(.largeTitle)
+                    .bold()
 
-            Text("Days")
-                .font(.title3)
+                Text(days == 1 ? "Day" : "Days")
+                    .font(.title3)
+            } else if let days = daysUntilPeriod {
+                Text(days == 0 ? "Period due" : "Period late")
+                    .font(.title3)
+                Text(days == 0 ? "Today" : "\(-days) \(days == -1 ? "Day" : "Days")")
+                    .font(.largeTitle)
+                    .bold()
+            } else {
+                Text("Log your period")
+                    .font(.title3)
+            }
 
-            Text("Luteral Phase")
+            Text(phase)
                 .font(.system(size: 16, weight: .medium))
                 .foregroundStyle(.white)
                 .frame(width: 150, height: 42)
@@ -132,4 +146,5 @@ struct CycleProgressRing: View {
 
 #Preview {
     CycleRingView()
+        .previewTrackingStore()
 }

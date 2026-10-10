@@ -37,6 +37,27 @@ struct PeriodDueViewModel {
         }
     }
 
+    /// Share of the cycle still to go, 1 (full cycle ahead) down to 0 (period due).
+    /// Drives the cycle ring as a countdown: the arc shrinks back towards the droplet.
+    func cycleProgress(in answers: [PollAnswers]) -> Double {
+        guard let days = daysUntilNextPeriod(in: answers) else { return 0 }
+        let remaining = Double(days) / Double(cycleLength)
+        return min(max(remaining, 0), 1)
+    }
+
+    /// Cycle phase for today, estimated from days left until the next period.
+    func phase(in answers: [PollAnswers]) -> String {
+        guard let days = daysUntilNextPeriod(in: answers) else { return "Not logged" }
+        // Day 1 is the first day of the last period.
+        let cycleDay = cycleLength - days + 1
+        switch cycleDay {
+        case ...5: return "Menstrual Phase"
+        case 6...13: return "Follicular Phase"
+        case 14...16: return "Ovulation Phase"
+        default: return "Luteal Phase"
+        }
+    }
+
     private static func dayCount(_ days: Int) -> String {
         days == 1 ? "1 Day" : "\(days) Days"
     }

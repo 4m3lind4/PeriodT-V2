@@ -7,21 +7,36 @@
 
 import SwiftUI
 
-/// Hosts the cycle ring and animates it from 0 to its value on appear.
+/// Hosts the cycle ring and animates it to today's point in the cycle.
+/// Uses the same period-due maths as the Calendar header so the two always agree.
 struct CycleRingView: View {
+    @EnvironmentObject private var store: TrackingStore
     @State var progressValue: Float = 0.0
+
+    private let periodDue = PeriodDueViewModel()
+
     var body: some View {
         VStack{
-            CycleProgressRing(progress: self.$progressValue)
+            CycleProgressRing(
+                progress: self.$progressValue,
+                daysUntilPeriod: periodDue.daysUntilNextPeriod(in: store.allReviews),
+                phase: periodDue.phase(in: store.allReviews)
+            )
                 .frame(width: 260.0, height: 260)
-                .padding(20.0).onAppear(){
-                    self.progressValue = 0.30
-                }
+                .padding(20.0)
+                .onAppear { updateProgress() }
+                // New poll answers can move the due date.
+                .onChange(of: store.allReviews.count) { _, _ in updateProgress() }
         }
+    }
+
+    private func updateProgress() {
+        progressValue = Float(periodDue.cycleProgress(in: store.allReviews))
     }
 }
 
 
 #Preview {
     CycleRingView()
+        .previewTrackingStore()
 }
