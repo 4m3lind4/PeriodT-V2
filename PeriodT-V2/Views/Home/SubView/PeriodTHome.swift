@@ -47,9 +47,10 @@ struct PeriodTHome: View {
                         proxy.scrollTo(topID, anchor: .top)
                     }
                 } label: {
-                    PrimaryButtonLabel(title: "Submit")
+                    PrimaryButtonLabel(title: "Submit", style: .filledSoft)
                 }
                 .padding(.top, 16)
+
             }
             .padding(10)
         }

@@ -69,11 +69,21 @@
 			);
 			target = 7F944F9E3079E0C700DC27BE /* PeriodTWidgetExtension */;
 		};
+		7F9450B7307A276A00DC27BE /* Exceptions for "PeriodT-V2" folder in "PeriodT-V2" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 7F944D27306E0E0600DC27BE /* PeriodT-V2 */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		7F944D2A306E0E0600DC27BE /* PeriodT-V2 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				7F9450B7307A276A00DC27BE /* Exceptions for "PeriodT-V2" folder in "PeriodT-V2" target */,
+			);
 			path = "PeriodT-V2";
 			sourceTree = "<group>";
 		};
@@ -526,6 +536,8 @@
 				DEVELOPMENT_TEAM = 7LYGPBJD5C;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PeriodT-V2/Info.plist";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -558,6 +570,8 @@
 				DEVELOPMENT_TEAM = 7LYGPBJD5C;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PeriodT-V2/Info.plist";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

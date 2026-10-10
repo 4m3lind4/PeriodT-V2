@@ -23,6 +23,16 @@ struct PrimaryButtonLabel: View {
         case light
         /// White text on a pink background - for use on white screens.
         case filled
+        /// Light pink text on a pink background - a softer `filled`.
+        case filledSoft
+    }
+
+    private var textColor: Color {
+        switch style {
+        case .light: CoreColor.primary
+        case .filled: .white
+        case .filledSoft: CoreColor.ringBackground
+        }
     }
 
     let title: String
@@ -31,7 +41,7 @@ struct PrimaryButtonLabel: View {
     var body: some View {
         Text(title)
             .font(.system(size: 16, weight: .semibold, design: .rounded))
-            .foregroundStyle(style == .light ? CoreColor.primary : .white)
+            .foregroundStyle(textColor)
             .padding(.horizontal, 40)
             .padding(.vertical, 10)
             .background(style == .light ? CoreColor.ringBackground : CoreColor.primary)
@@ -43,6 +53,7 @@ struct PrimaryButtonLabel: View {
 #Preview {
     VStack(spacing: 20) {
         PrimaryButtonLabel(title: "Submit")
+        PrimaryButtonLabel(title: "Submit", style: .filledSoft)
         PrimaryButtonLabel(title: "Start", style: .filled)
     }
     .padding()
