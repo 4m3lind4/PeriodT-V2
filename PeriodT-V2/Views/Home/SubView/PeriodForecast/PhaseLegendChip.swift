@@ -1,13 +1,14 @@
 //
 //  PhaseLegendChip.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 13/9/2026.
+//
+//  A small coloured pill naming one cycle phase, used under the forecast chart.
 //
 
 import SwiftUI
 
-/// Small coloured pill naming one cycle phase, shown under the forecast chart.
 struct PhaseLegendChip: View {
     let title: String
     let color: Color

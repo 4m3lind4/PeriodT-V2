@@ -2,6 +2,8 @@
 //  HomeUITests.swift
 //  PeriodT-V2UITests
 //
+//  UI tests for Home: the cycle ring, today's programs and the daily check-in.
+//
 
 import XCTest
 

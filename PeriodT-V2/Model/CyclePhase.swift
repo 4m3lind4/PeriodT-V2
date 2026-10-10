@@ -4,17 +4,21 @@
 //
 //  Created by Jessica Amelinda Mang on 10/10/2026.
 //
+//  Works out which menstrual phase the athlete is in from their logged periods.
+//  This drives the phase notification and the colours on the cycle ring.
+//
 
 import Foundation
 
-/// The four menstrual cycle phases, worked out from days since the last period started.
 enum CyclePhase: String {
     case menstrual = "Menstrual"
     case follicular = "Follicular"
     case ovulation = "Ovulation"
     case luteal = "Luteal"
 
-    /// Day 1 is the first day of the last logged period.
+    /// Day 1 is the first day of the last logged period. The day ranges are the usual
+    /// textbook split of a 28 day cycle. Every athlete is different, so this is a rough
+    /// guide for the app, not something to diagnose with.
     init(cycleDay: Int) {
         if cycleDay <= 5 {
             self = .menstrual
@@ -49,7 +53,8 @@ enum CyclePhase: String {
         guard let last = PeriodDueViewModel.latestPeriodStart(in: answers, onOrBefore: day),
               let daysSince = Calendar.current.dateComponents([.day], from: last.startOfDay, to: day).day
         else { return nil }
-        // Wrap around if the user is past a full cycle without logging.
+        // If they've gone a full cycle without logging, wrap around rather than
+        // getting stuck in luteal forever.
         let cycleDay = (daysSince % cycleLength) + 1
         return CyclePhase(cycleDay: cycleDay)
     }

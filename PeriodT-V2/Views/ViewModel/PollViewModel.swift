@@ -1,14 +1,15 @@
 //
 //  PollViewModel.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 14/9/2026.
+//
+//  The list of yes/no questions asked in the daily check-in on Home.
 //
 
 import Foundation
 import Combine
 
-/// The fixed list of yes/no questions shown in the daily review.
 final class DayPoleModel: ObservableObject {
     @Published var questions: [PollQuestion] = [
         PollQuestion(kind: .trained, text: "Did you practice or train today?", color: CoreColor.secondary),

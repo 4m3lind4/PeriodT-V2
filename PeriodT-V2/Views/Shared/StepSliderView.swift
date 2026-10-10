@@ -4,11 +4,13 @@
 //
 //  Created by Jessica Amelinda Mang on 8/10/2026.
 //
+//  A five-step slider used for both the emotional intensity and workout
+//  intensity questions. It's custom rather than a system Slider so it snaps to
+//  each step.
+//
 
 import SwiftUI
 
-/// Generic five-step slider with a title and end labels.
-/// Used for both the emotional-intensity and workout-intensity questions.
 struct StepSliderView: View {
     static let steps = 5
 
@@ -44,10 +46,10 @@ struct StepSliderView: View {
         }
     }
 
-    /// Capsule track, one dot per step, and the thumb positioned over the selected step.
+    /// The track, a dot for each step and the thumb sitting over whichever step is picked.
     private var track: some View {
         GeometryReader { geo in
-            // Divide the track into equal steps; thumb sits in the middle of its step.
+            // Split the track into equal steps and sit the thumb in the middle of its one.
             let stepWidth = geo.size.width / CGFloat(Self.steps)
             let thumbX = stepWidth * (CGFloat(selectedStep) + 0.5)
 
@@ -72,7 +74,7 @@ struct StepSliderView: View {
                     .position(x: thumbX, y: geo.size.height / 2)
             }
             .contentShape(Rectangle())
-            // Tap or drag anywhere on the track to snap to the nearest step.
+            // Tap or drag anywhere on the track and it snaps to the closest step.
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { value in
@@ -82,7 +84,8 @@ struct StepSliderView: View {
             )
             .animation(.snappy(duration: 0.2), value: selectedStep)
         }
-        // The drag gesture isn't reachable with VoiceOver, so expose it as an adjustable control.
+        // VoiceOver can't use a drag gesture, so expose it as an adjustable control
+        // instead (swipe up/down to change it).
         .accessibilityElement()
         .accessibilityLabel(title)
         .accessibilityValue("\(selectedStep + 1) of \(Self.steps)")

@@ -4,11 +4,15 @@
 //
 //  Created by Jessica Amelinda Mang on 8/10/2026.
 //
+//  The pink error card and the plumbing to show it. Any view can call
+//  `presentError(...)` from the environment and the nearest `.errorCardHost()`
+//  slides the card up. I set it up this way so screens don't each need their own
+//  error state and alert, and every error looks the same across the app.
+//
 
 import SwiftUI
 
-/// Pink error card used for every user-facing error in the app.
-/// Presented by `.errorCardHost()`; screens don't build this directly.
+/// Screens don't build this themselves, `.errorCardHost()` shows it.
 struct ErrorCardView: View {
     let error: AppError
     let onDismiss: () -> Void
@@ -45,8 +49,8 @@ struct ErrorCardView: View {
 
 // MARK: - Presentation
 
-/// Injected by `.errorCardHost()`. Any child view can call
-/// `presentError(.saveFailed(.journal))` and the nearest host shows the card.
+/// Set by `.errorCardHost()`. Any child view can call `presentError(.saveFailed(.journal))`
+/// and the nearest host shows the card. Outside a host it does nothing.
 struct PresentErrorKey: EnvironmentKey {
     static let defaultValue: (AppError) -> Void = { _ in }
 }
@@ -58,9 +62,9 @@ extension EnvironmentValues {
     }
 }
 
-/// Owns the currently shown error and overlays the card at the bottom of the
-/// screen. Errors slide up, auto-dismiss after `dismissDelay` (unless the
-/// error says otherwise), and a new error restarts the timer.
+/// Holds whichever error is showing and overlays the card at the bottom of the screen.
+/// Errors slide up and go away after `dismissDelay` (unless the error says to stay),
+/// and a new error restarts the timer.
 struct ErrorCardHost: ViewModifier {
     static let dismissDelay: Duration = .seconds(3)
 
@@ -95,9 +99,8 @@ struct ErrorCardHost: ViewModifier {
 }
 
 extension View {
-    /// Makes this view (typically a whole screen or sheet) the place where
-    /// errors raised by its children are shown. Pass `initial` to show an
-    /// error as soon as the screen appears (e.g. a failed data store).
+    /// Makes this view (usually a whole screen or sheet) the place where errors from
+    /// anything inside it get shown. Pass `initial` to show one straight away.
     func errorCardHost(initial: AppError? = nil) -> some View {
         modifier(ErrorCardHost(initial: initial))
     }

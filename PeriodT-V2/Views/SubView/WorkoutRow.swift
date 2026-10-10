@@ -4,17 +4,11 @@
 //
 //  Created by Jessica Amelinda Mang on 5/10/2026.
 //
+//  One exercise row inside an expanded program card.
+//
 
-
-//
-//  WorkoutRow.swift
-//  PeriodT
-//
-//  Created by Jessica Amelinda Mang on 14/9/2026.
-//
 import SwiftUI
 
-/// One exercise in an expanded program: thumbnail, name, then sets on the right.
 struct WorkoutRow: View {
     let workout: Workout
     var thumbnailSize: CGFloat = 76

@@ -1,27 +1,28 @@
 //
 //  CalendarViewModel.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 13/9/2026.
+//
+//  Works out the period highlights on the Calendar tab: days the athlete logged
+//  a period, predicted periods and the few days leading up to one.
 //
 
 import Foundation
 import Combine
 import SwiftUI
 
-/// Works out the calendar's period highlights from the user's logged reviews:
-/// the days they logged a period, plus predicted period and pre-period days.
 /// Call `update(with:)` whenever the reviews change.
 class CalendarViewModel: ObservableObject {
 
     @Published var amountOfPrePeriodDays: Int = 3
-    /// Length of each predicted period. Set from the average logged period,
-    /// and only kept at this default until the user has logged one.
+    /// How long each predicted period lasts. This becomes the athlete's own average
+    /// once they've logged one, since everyone's period length is different.
     @Published var amountOfPeriodDays: Int = 6
     /// How many upcoming periods to predict.
     var amountOfPredictedCycles = 2
 
-    /// Shared with the "Period Due" header and the widget, so all three agree on when the next period starts.
+    /// Same maths as the "Period Due" header and the widget, so all three agree.
     var periodDue = PeriodDueViewModel()
 
     /// Days the user answered "yes" to being on their period, as `startOfDay`.
@@ -29,14 +30,15 @@ class CalendarViewModel: ObservableObject {
     @Published var prePeriodDates: [Date] = []
     @Published var periodDates: [Date] = []
 
-    /// Kept so the predictions can be rebuilt from the same logs.
+    /// Held on to so the predictions can be rebuilt from the same logs.
     private var reviews: [PollAnswers] = []
 
     init(reviews: [PollAnswers] = []) {
         update(with: reviews)
     }
 
-    /// Rebuilds logged and predicted days from `reviews`.
+    /// Rebuilds everything from scratch. Order matters here: the first prediction has
+    /// to exist before it can be extended, and pre-period days hang off the first one.
     func update(with reviews: [PollAnswers]) {
         self.reviews = reviews
         loggedPeriodDates = Set(reviews
@@ -59,7 +61,7 @@ class CalendarViewModel: ObservableObject {
         return prePeriodDates.contains { $0.startOfDay == day.startOfDay }
     }
 
-    /// Pre-period days are the N days immediately before the next predicted period.
+    /// The few days right before the next predicted period.
     func calculatePrePeriodTime() {
         guard let nextPeriodStart = periodDates.min() else {
             self.prePeriodDates = []
@@ -70,8 +72,8 @@ class CalendarViewModel: ObservableObject {
         }
     }
 
-    /// Next period starts a full cycle after the last logged period started.
-    /// Nothing is predicted until the user has logged a period.
+    /// The next period starts a full cycle after the last logged one started. Nothing
+    /// gets predicted until the athlete has logged at least one period.
     func calculatePeriodTimes() {
         guard let lastPeriod = periodDue.lastPeriodStart(in: reviews),
               let startOfPeriodDay = Calendar.current.date(byAdding: .day, value: periodDue.cycleLength, to: lastPeriod.startOfDay)
@@ -83,13 +85,13 @@ class CalendarViewModel: ObservableObject {
         self.periodDates = calculatePeriodDates(startOfPeriodDay)
     }
 
-    /// After `calculatePeriodTimes()`, adds further predicted periods, each a full cycle
-    /// after the previous one started, until there are `amountOfPredictedCycles`.
+    /// Runs after `calculatePeriodTimes()` and keeps adding periods a cycle apart until
+    /// there are `amountOfPredictedCycles` of them.
     func calculateNewMonthPeriod() {
         // Nothing to extend from if no period has been predicted yet.
         guard var lastStart = periodDates.min() else { return }
-        // Counted rather than checked via `periodBatches()`, since very long periods
-        // can merge into one run and would never reach the target count.
+        // Counted with a loop rather than checking `periodBatches()`, because really long
+        // periods can merge into one run and it'd never reach the target.
         for _ in 1..<max(amountOfPredictedCycles, 1) {
             guard let startOfNextPeriod = Calendar.current.date(byAdding: .day, value: periodDue.cycleLength, to: lastStart)
             else { return }
@@ -117,19 +119,19 @@ class CalendarViewModel: ObservableObject {
         return Int((Double(totalDays) / Double(runs.count)).rounded())
     }
 
-    /// Groups `periodDates` into runs of consecutive days, so each cycle
-    /// can be treated as its own block (used for first/last-day checks).
+    /// Splits `periodDates` into one block per period, which the calendar uses to
+    /// round off the first and last day of each pill.
     func periodBatches() -> [[Date]] {
         Self.consecutiveRuns(of: periodDates)
     }
 
-    /// Sorts `dates`, drops repeated days, and splits them wherever a day is skipped.
+    /// Sorts the dates, drops repeats and starts a new run wherever a day is skipped.
     static func consecutiveRuns(of dates: [Date]) -> [[Date]] {
         var runs: [[Date]] = []
         var currentRun: [Date] = []
 
         for day in dates.sorted() {
-            // Overlapping predictions can repeat a day; it doesn't start a new run.
+            // Overlapping predictions can repeat a day, which shouldn't start a new run.
             if let last = currentRun.last, Calendar.current.isDate(day, inSameDayAs: last) {
                 continue
             }

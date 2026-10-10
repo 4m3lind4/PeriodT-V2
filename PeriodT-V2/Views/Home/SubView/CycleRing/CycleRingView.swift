@@ -1,14 +1,15 @@
 //
 //  CycleRingView.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 11/9/2026.
+//
+//  Feeds the cycle ring its numbers from the store and animates it to today.
 //
 
 import SwiftUI
 
-/// Hosts the cycle ring and animates it to today's point in the cycle.
-/// Uses the same period-due maths as the Calendar header so the two always agree.
+/// Uses the same PeriodDueViewModel maths as the calendar so the two never disagree.
 struct CycleRingView: View {
     @EnvironmentObject private var store: TrackingStore
     @State var progressValue: Float = 0.0
@@ -25,7 +26,7 @@ struct CycleRingView: View {
                 .frame(width: 260.0, height: 260)
                 .padding(20.0)
                 .onAppear { updateProgress() }
-                // New or edited poll answers can move the due date.
+                // Logging or editing a period can move the due date, so re-animate.
                 .onChange(of: periodDue.cycleProgress(in: store.allReviews)) { _, _ in updateProgress() }
         }
     }

@@ -4,13 +4,14 @@
 //
 //  Created by Jessica Amelinda Mang on 4/10/2026.
 //
+//  The form for adding a new program and saving it to Supabase.
+//
 
 import SwiftUI
 
-/// Form for entering a new exercise program and saving it to Supabase.
 struct AddProgramView: View {
     let repository: IPeriodTRepository
-    /// Called after a successful save so the list can refresh.
+    /// Runs after a successful save so the list can refresh.
     var onSaved: () async -> Void
     
     @Environment(\.dismiss) private var dismiss
@@ -21,8 +22,8 @@ struct AddProgramView: View {
     @State private var exerciseType: ExerciseType = .physio
     @State private var workouts: [Workout] = [Workout(name: "", sets: 3)]
     
-    /// Kept across Save taps, so retrying after a failed save completes the same
-    /// program rather than creating a second one.
+    /// Made once and kept across Save taps, so retrying after a failure finishes the
+    /// same program rather than creating a duplicate.
     @State private var programID = UUID()
     @State private var isSaving = false
     @State private var errorMessage: String?
@@ -112,7 +113,7 @@ struct AddProgramView: View {
         }
     }
     
-    /// 0 sets means "untracked", stored as nil.
+    /// 0 sets means it isn't counted in sets, which is saved as nil.
     private func setsBinding(_ workout: Binding<Workout>) -> Binding<Int> {
         Binding(
             get: { workout.wrappedValue.sets ?? 0 },

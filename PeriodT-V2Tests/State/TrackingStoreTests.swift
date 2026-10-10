@@ -2,6 +2,9 @@
 //  TrackingStoreTests.swift
 //  PeriodT-V2Tests
 //
+//  Tests the store's loading, local edits and debounced saving, including the
+//  tricky case of a reload landing before a save has gone through.
+//
 
 import Foundation
 import Testing

@@ -4,12 +4,13 @@
 //
 //  Created by Jessica Amelinda Mang on 10/10/2026.
 //
+//  Looks after notification permission. iOS only ever shows the system prompt
+//  once, so after that all we can do is read what the user picked.
+//
 
 import OSLog
 import UserNotifications
 
-/// Owns notification permission. iOS only shows the system prompt once,
-/// so after that we can only read the user's choice.
 final class NotificationManager {
 
     static let shared = NotificationManager()
@@ -18,7 +19,7 @@ final class NotificationManager {
 
     private init() {}
 
-    /// The user's current choice (not asked yet, allowed, denied, …).
+    /// The user's current choice (not asked yet, allowed, denied etc).
     func authorizationStatus() async -> UNAuthorizationStatus {
         await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
     }
@@ -31,8 +32,8 @@ final class NotificationManager {
         }
     }
 
-    /// Shows the system prompt if the user hasn't been asked yet.
-    /// Returns whether we're allowed to send notifications.
+    /// Shows the system prompt if the user hasn't been asked yet, then returns
+    /// whether we're allowed to send notifications.
     @discardableResult
     func requestPermissionIfNeeded() async -> Bool {
         guard await authorizationStatus() == .notDetermined else { return await isAuthorized() }

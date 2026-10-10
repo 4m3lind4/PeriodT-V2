@@ -2,6 +2,8 @@
 //  JournalUITests.swift
 //  PeriodT-V2UITests
 //
+//  UI tests for the Journal tab: goals, the entry list and writing a new entry.
+//
 
 import XCTest
 

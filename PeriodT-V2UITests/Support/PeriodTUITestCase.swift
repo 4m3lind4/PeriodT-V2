@@ -2,8 +2,8 @@
 //  PeriodTUITestCase.swift
 //  PeriodT-V2UITests
 //
-//  Base class: launches the app against `MockPeriodTRepository` (via `-UITesting`)
-//  so tests are deterministic and never touch Supabase.
+//  Base class for the UI tests. Launches the app with `-UITesting` so it runs
+//  on MockPeriodTRepository, which keeps the tests repeatable and away from Supabase.
 //
 
 import XCTest

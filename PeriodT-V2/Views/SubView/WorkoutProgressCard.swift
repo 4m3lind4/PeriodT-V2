@@ -4,10 +4,11 @@
 //
 //  Created by Jessica Amelinda Mang on 10/10/2026.
 //
+//  An exercise card in the in-progress program list.
+//
 
 import SwiftUI
 
-/// Pale pink exercise card on the in-progress program list. Tapping it opens the set tracker.
 struct WorkoutProgressCard: View {
     let workout: Workout
 

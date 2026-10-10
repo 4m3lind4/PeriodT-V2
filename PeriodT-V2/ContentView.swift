@@ -4,13 +4,14 @@
 //
 //  Created by Jessica Amelinda Mang on 1/10/2026.
 //
+//  The root view. Holds the four tabs and does the app-wide jobs that don't
+//  belong to any one screen: loading the store, keeping notifications up to date
+//  and opening the right tab when a notification is tapped.
+//
 
 import Combine
 import SwiftUI
 
-/// Root of the app: a three-tab layout (Home, Calendar, Exercise).
-/// Tab selection and the exercise navigation stack live in `AppNavigationViewModel`
-/// so deep screens (e.g. the completed-program page) can jump back home.
 struct ContentView: View {
     let repository: IPeriodTRepository
 
@@ -21,8 +22,7 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $navigation.selectedTab) {
-            // Placeholder Home until a dedicated home screen is ported.
-            // PeriodTHome scrolls itself (so its Submit can jump back to the top).
+            // PeriodTHome handles its own scrolling so Submit can jump back to the top.
             PeriodTHome()
                 .padding(.horizontal)
                 .errorCardHost()
@@ -39,7 +39,7 @@ struct ContentView: View {
                 }
                 .tag(AppNavigationViewModel.Tab.calendar)
 
-            // PeriodTExercises owns its NavigationStack (bound to navigation.exercisePath).
+            // PeriodTExercises owns its NavigationStack, bound to navigation.exercisePath.
             PeriodTExercises(repository: repository)
                 .errorCardHost()
                 .tabItem {
@@ -56,27 +56,27 @@ struct ContentView: View {
                 .tag(AppNavigationViewModel.Tab.journal)
         }
         .tint(CoreColor.primary)
-        // Load first so the first schedule knows which days are already checked in.
-        // On first launch requestPermissionIfNeeded shows the system prompt.
+        // Load the data before scheduling anything, otherwise the first round of
+        // notifications wouldn't know which days are already checked in.
         .task {
             await store.load()
             await NotificationManager.shared.requestPermissionIfNeeded()
             await rescheduleNotifications()
         }
-        // Rebuild notifications when a period, check-in or program changes.
-        // The short wait lets the burst of edits (and the first load) settle.
+        // Rebuild notifications whenever a period, check-in or program changes. The
+        // one second wait lets a burst of edits settle so we only reschedule once.
         .task(id: NotificationPlanner.Inputs(reviews: store.allReviews, programs: store.programs)) {
             try? await Task.sleep(for: .seconds(1))
             guard !Task.isCancelled else { return }
             await rescheduleNotifications()
         }
-        // Dates move on overnight, so top the plan up whenever the app comes back.
+        // Dates move on overnight, so top the plan up whenever the app is reopened.
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 Task { await rescheduleNotifications() }
             }
         }
-        // Ticking workouts changes the calendar dots, so refresh on leaving Exercise.
+        // Ticking workouts changes the calendar dots, so refresh when switching tabs.
         .onChange(of: navigation.selectedTab) { _, _ in
             Task { await store.load() }
         }

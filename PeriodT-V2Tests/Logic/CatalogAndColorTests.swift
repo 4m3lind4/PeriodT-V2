@@ -2,6 +2,8 @@
 //  CatalogAndColorTests.swift
 //  PeriodT-V2Tests
 //
+//  Tests the exercise photo lookup and the hex colour helper.
+//
 
 import Foundation
 import SwiftUI

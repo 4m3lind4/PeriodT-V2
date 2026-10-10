@@ -1,25 +1,28 @@
 //
 //  PollAnswers.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 14/9/2026.
+//
+//  Everything the athlete logs for a single day: the yes/no check-in questions,
+//  their mood, how intense the day felt and their journal. It's stored as one row
+//  per user per day in Supabase's `daily_reviews` table.
 //
 
 import Foundation
 
-/// The user's poll answers, mood and journal for one calendar day.
-/// One row per user per day in Supabase's `daily_reviews` table.
 struct PollAnswers: Codable, Equatable {
     /// The calendar day, normalised to `startOfDay`.
     let date: Date
 
-    /// Keyed by `PollQuestionKind.rawValue`; stored as a jsonb object.
+    /// Keyed by `PollQuestionKind.rawValue` and saved as a jsonb object, so adding
+    /// a new question doesn't need a database migration.
     private var rawAnswers: [String: String] = [:]
 
     /// Free-text journal entry for the day.
     var journal: String = ""
 
-    /// `Emotion.rawValue`; unknown values read as nil.
+    /// `Emotion.rawValue`. Anything unrecognised just reads as nil.
     private var rawEmotion: String?
 
     /// 0 (very unpleasant) ... 4 (very pleasant). Nil until the user moves the slider.
@@ -30,9 +33,9 @@ struct PollAnswers: Codable, Equatable {
         set { rawEmotion = newValue?.rawValue }
     }
 
-    /// Workout journals from the completed-program screen, one per program,
-    /// separate from the emotional `journal`. Kept inside the `answers` jsonb as
-    /// "workout_journal:<program id>" so no new column is needed; `answers` below skips these keys.
+    /// Workout journals written on the completed-program screen, one per program and
+    /// separate from the emotional `journal`. They live in the same `answers` jsonb under
+    /// "workout_journal:<program id>" so I didn't need a new column. `answers` below skips them.
     var workoutJournals: [UUID: String] {
         var result: [UUID: String] = [:]
         for (key, value) in rawAnswers where key.hasPrefix(Self.workoutJournalPrefix) {
@@ -53,7 +56,7 @@ struct PollAnswers: Codable, Equatable {
 
     private static let workoutJournalPrefix = "workout_journal:"
 
-    /// Typed view of `rawAnswers`; unknown keys/values are skipped.
+    /// `rawAnswers` turned back into proper types. Anything it doesn't recognise is skipped.
     var answers: [PollQuestionKind: ReviewAnswer] {
         var result: [PollQuestionKind: ReviewAnswer] = [:]
         for (key, value) in rawAnswers {
@@ -83,7 +86,7 @@ struct PollAnswers: Codable, Equatable {
 
     // MARK: - Supabase row
 
-    /// `user_id` is left out: the database fills it from the signed-in user.
+    /// No `user_id` here, the database fills it in from whoever is signed in.
     enum CodingKeys: String, CodingKey {
         case date = "day"
         case rawAnswers = "answers"
@@ -91,8 +94,8 @@ struct PollAnswers: Codable, Equatable {
         case journal, intensity
     }
 
-    /// `day` is a Postgres `date`, sent as "yyyy-MM-dd" in the local calendar.
-    /// A full timestamp would be converted to UTC and could land on the wrong day.
+    /// `day` is a Postgres `date`, so it goes up as "yyyy-MM-dd" in local time. Sending a
+    /// full timestamp gets converted to UTC, which in Sydney can push it onto the wrong day.
     private static let dayFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .gregorian)
@@ -121,7 +124,7 @@ struct PollAnswers: Codable, Equatable {
         try container.encode(Self.dayFormatter.string(from: date), forKey: .date)
         try container.encode(rawAnswers, forKey: .rawAnswers)
         try container.encode(journal, forKey: .journal)
-        // Explicit nulls so clearing a value on an existing row sticks.
+        // Send real nulls, otherwise clearing a value on an existing row wouldn't stick.
         try container.encode(rawEmotion, forKey: .rawEmotion)
         try container.encode(intensity, forKey: .intensity)
     }

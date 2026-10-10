@@ -1,8 +1,10 @@
 //
 //  GoalProgressBar.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 13/9/2026.
+//
+//  The progress bar inside "My Progress" on Home.
 //
 
 import SwiftUI

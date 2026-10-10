@@ -4,25 +4,22 @@
 //
 //  Created by Jessica Amelinda Mang on 4/10/2026.
 //
-
-//
-//  Workout.swift
-//  PeriodT
-//
-//  Created by Jessica Amelinda Mang on 14/9/2026.
+//  A single exercise inside a program, plus whether the signed-in athlete has
+//  ticked it off.
 //
 
 import Foundation
 
-/// One exercise inside a program. `sets` is optional for timed/untracked work.
+/// `sets` is optional for things like walking that aren't counted in sets.
 struct Workout: Identifiable, Hashable, Codable {
     var id = UUID()
     var name: String
     var sets: Int?
     var reps: Int?
     var restSeconds: Int?
-    /// Whether the signed-in user has ticked this off. Stored in Supabase's
-    /// `workout_completions` table, which is per user because programs can be shared.
+    /// Whether the signed-in athlete has ticked this off. Lives in its own
+    /// `workout_completions` table because programs are shared, so one athlete
+    /// finishing a workout shouldn't tick it for everyone else.
     var isCompleted = false
 
     enum CodingKeys: String, CodingKey {
@@ -31,7 +28,7 @@ struct Workout: Identifiable, Hashable, Codable {
         case completions = "workout_completions"
     }
 
-    /// Only `completed_at` is selected; the row existing is what matters.
+    /// Only `completed_at` is fetched. All that matters is whether the row exists.
     private struct Completion: Codable {
         let completedAt: Date
 
@@ -42,11 +39,12 @@ struct Workout: Identifiable, Hashable, Codable {
 }
 
 extension Workout {
-    /// How many tappable set rows to show. Untracked work still gets one row to tick off.
+    /// How many set rows to show. Untracked work still gets one row so it can be ticked off.
     var setCount: Int { max(sets ?? 1, 1) }
 }
 
-// In an extension so the memberwise init (used by previews and AddProgramView) is kept.
+// Custom decoding lives in an extension so Swift still gives me the memberwise init
+// (previews and AddProgramView rely on it).
 extension Workout {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -55,7 +53,7 @@ extension Workout {
         sets = try container.decodeIfPresent(Int.self, forKey: .sets)
         reps = try container.decodeIfPresent(Int.self, forKey: .reps)
         restSeconds = try container.decodeIfPresent(Int.self, forKey: .restSeconds)
-        // RLS only returns the current user's rows, so any row means "done by me".
+        // RLS only returns the current user's rows, so any row at all means they've done it.
         let completions = try container.decodeIfPresent([Completion].self, forKey: .completions) ?? []
         isCompleted = !completions.isEmpty
     }

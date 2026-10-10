@@ -4,19 +4,12 @@
 //
 //  Created by Jessica Amelinda Mang on 5/10/2026.
 //
-
-
-//
-//  ScreenHeader.swift
-//  PeriodT
-//
-//  Created by Jessica Amelinda Mang on 14/9/2026.
+//  The title row at the top of each tab, with the profile icon on the right.
 //
 
 import SwiftUI
 
-/// Page title on the left with the profile icon on the right.
-/// Pass custom `content` to replace the plain title (e.g. the Home greeting).
+/// Pass in `content` to swap the plain title for something else, like Home's greeting.
 struct ScreenHeader<Content: View>: View {
     private let content: Content
 
@@ -36,7 +29,7 @@ struct ScreenHeader<Content: View>: View {
 }
 
 extension ScreenHeader where Content == Text {
-    /// Convenience for the common single-title case.
+    /// Shortcut for the usual case of just a title.
     init(title: String) {
         self.init {
             Text(title)

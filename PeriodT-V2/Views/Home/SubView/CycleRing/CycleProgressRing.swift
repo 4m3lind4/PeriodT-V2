@@ -1,25 +1,27 @@
 //
 //  CycleProgressRing.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 14/9/2026.
+//
+//  The ring on Home that counts down to the next period. The arc shrinks back
+//  towards the droplet as the period gets closer, and the smiley marks where the
+//  athlete is today. Purely visual, all the numbers come in from CycleRingView.
 //
 
 import Foundation
 import SwiftUI
 
-/// Circular cycle ring. Draws a background track, an animated progress arc,
-/// a "period" marker at the start, and a "user" marker at the current progress.
 struct CycleProgressRing: View {
     @Binding var progress: Float
-    /// Days until the next period; nil when no period has been logged.
+    /// Days until the next period, or nil if no period has been logged yet.
     var daysUntilPeriod: Int?
     var phase: String
     private let strokeWidth: CGFloat = 32.0
 
     private let startDegrees: Double = 270.0
 
-    /// Converts an angle (degrees) into a point on the ring's circumference.
+    /// Turns an angle in degrees into a point on the ring, so the markers can sit on the track.
     func endPosition(for angle: Double, in size: CGSize) -> CGPoint {
         let radius = (min(size.width, size.height) / 2) - (strokeWidth / 2) + 16
         let radians = angle * .pi / 180
@@ -33,7 +35,8 @@ struct CycleProgressRing: View {
         
         GeometryReader{ geometry in
             let size = geometry.size
-            // Work out where the start, progress and pre-start markers sit.
+            // The ring starts at the top (270°) and goes clockwise, so the droplet sits at
+            // the start and the smiley sits wherever the progress arc ends.
             let startAngle = startDegrees - 360
             let endAngle = startAngle + Double(progress) * 360.0
 
@@ -42,7 +45,7 @@ struct CycleProgressRing: View {
 
 
             ZStack {
-                // Background track
+                // Background track.
                 Circle()
                     .stroke(
                         CoreColor.ringBackground,
@@ -50,7 +53,7 @@ struct CycleProgressRing: View {
                     )
                 
                     .opacity(0.70)
-                // Progress arc - trimmed to `progress` and animated on change
+                // Progress arc, trimmed to `progress` and animated when it changes.
                 Circle()
                     .trim(
                         from: 0.0,
@@ -79,7 +82,7 @@ struct CycleProgressRing: View {
                     )
                 
                 
-                //PERIOD DEADLINE
+                // Droplet marking when the period is due.
                 Circle()
                     .fill(CoreColor.primary)
                     .frame(width: strokeWidth, height: strokeWidth)
@@ -89,7 +92,7 @@ struct CycleProgressRing: View {
                             .foregroundColor(.white)
                 )
                     .position(startPos)
-                //USER CIRCLE
+                // Smiley marking where the athlete is today.
                 Circle()
                     .fill(CoreColor.ringBackground)
                     .stroke(CoreColor.ringBackground, lineWidth: 4)
@@ -106,13 +109,12 @@ struct CycleProgressRing: View {
         }
     }
 
-    /// Days-until-period countdown and current phase, shown inside the ring.
+    /// The countdown and current phase in the middle of the ring.
     private var centerLabel: some View {
         VStack {
             if let days = daysUntilPeriod, days > 0 {
                 Text("Period in")
                     .font(.title3)
-                // Number of days remaining
                 Text("\(days)")
                     .font(.largeTitle)
                     .bold()

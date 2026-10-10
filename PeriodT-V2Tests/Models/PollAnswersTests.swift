@@ -2,6 +2,9 @@
 //  PollAnswersTests.swift
 //  PeriodT-V2Tests
 //
+//  Tests the daily review model, including the Supabase encoding and decoding
+//  (the date handling here is easy to get wrong across time zones).
+//
 
 import Foundation
 import SwiftUI

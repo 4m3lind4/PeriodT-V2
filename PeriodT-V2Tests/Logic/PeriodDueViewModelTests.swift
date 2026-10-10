@@ -2,6 +2,9 @@
 //  PeriodDueViewModelTests.swift
 //  PeriodT-V2Tests
 //
+//  Tests the "when is my next period" maths that Home, the calendar and the
+//  widget all depend on.
+//
 
 import Foundation
 import Testing

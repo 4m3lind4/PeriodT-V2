@@ -4,24 +4,28 @@
 //
 //  Created by Jessica Amelinda Mang on 10/10/2026.
 //
+//  The Home Screen / Lock Screen widget showing how many days until the next
+//  period, so an athlete can glance at it before training without opening the app.
+//
 
 import WidgetKit
 import SwiftUI
 
+/// Hands WidgetKit the countdown for each day.
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> PeriodCountdownEntry {
         PeriodCountdownEntry(date: Date(), daysUntilPeriod: 7)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (PeriodCountdownEntry) -> Void) {
-        // The widget gallery shows sample data until the user has logged a period.
+        // The widget gallery shows sample data until a period has been logged.
         let days = PeriodCountdownStore.daysUntilNextPeriod() ?? (context.isPreview ? 7 : nil)
         completion(PeriodCountdownEntry(date: Date(), daysUntilPeriod: days))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<PeriodCountdownEntry>) -> Void) {
         // One entry per day for the next week, so the countdown ticks over at midnight
-        // even if the app isn't opened. The app reloads the timeline when a new period is logged.
+        // even if the app isn't opened. When a new period is logged the app reloads this.
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let entries = (0..<7).compactMap { offset -> PeriodCountdownEntry? in
@@ -35,10 +39,11 @@ struct Provider: TimelineProvider {
 
 struct PeriodCountdownEntry: TimelineEntry {
     let date: Date
-    /// Days until the next predicted period; `nil` when nothing has been logged yet.
+    /// Days until the next predicted period, or nil if nothing's logged yet.
     let daysUntilPeriod: Int?
 }
 
+/// The extension can't see CoreColor in the app, so the widget keeps its own copies.
 private enum WidgetColor {
     static let pink = Color(red: 0.86, green: 0.44, blue: 0.59)
     static let blush = Color(red: 0.95, green: 0.80, blue: 0.85)
@@ -63,6 +68,7 @@ struct PeriodTWidgetExtensionEntryView : View {
         }
     }
 
+    /// When the period is late this shows how many days late, and the caption says so.
     private var headline: String {
         guard let days = entry.daysUntilPeriod else { return "?" }
         return days < 0 ? "\(-days)" : "\(days)"
@@ -79,7 +85,8 @@ struct PeriodTWidgetExtensionEntryView : View {
     }
 }
 
-/// Big chunky number with a white outline, drawn by stacking offset white copies behind it.
+/// A big chunky number with a white outline. SwiftUI text has no outline option, so
+/// this fakes one by stacking 16 white copies in a circle behind it.
 private struct OutlinedNumber: View {
     let text: String
     private let outline: CGFloat = 4
@@ -106,7 +113,7 @@ private struct OutlinedNumber: View {
     }
 }
 
-/// Soft pink gradient with a peach glow top-left and lavender glow top-right.
+/// Soft pink gradient with a lavender glow in the top right.
 private struct WidgetBackground: View {
     var body: some View {
         ZStack {
@@ -137,6 +144,7 @@ struct PeriodTWidgetExtension: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             PeriodTWidgetExtensionEntryView(entry: entry)
+                .environment(\.colorScheme, .light)
                 .containerBackground(for: .widget) {
                     WidgetBackground()
                 }

@@ -2,6 +2,8 @@
 //  ExerciseProgramTests.swift
 //  PeriodT-V2Tests
 //
+//  Tests programs and workouts: decoding from Supabase, set counts and status.
+//
 
 import Foundation
 import Testing

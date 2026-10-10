@@ -2,6 +2,8 @@
 //  CyclePhaseTests.swift
 //  PeriodT-V2Tests
 //
+//  Tests the phase boundaries and working out the phase on a given day.
+//
 
 import Foundation
 import Testing

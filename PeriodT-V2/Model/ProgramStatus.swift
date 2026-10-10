@@ -4,11 +4,12 @@
 //
 //  Created by Jessica Amelinda Mang on 8/10/2026.
 //
+//  Sorts programs into completed, missed, current and incoming, which decides
+//  how they're grouped and what colour their stripe is.
+//
 
 import SwiftUI
 
-/// Where a program sits relative to today and whether it was done.
-/// Drives grouping and the card's stripe colour.
 enum ProgramStatus {
     case completed, missed, current, incoming
 
@@ -23,13 +24,13 @@ enum ProgramStatus {
 }
 
 extension ExerciseProgram {
-    /// Every workout has been ticked off. A program with no workouts is never complete.
+    /// Every workout is ticked off. An empty program never counts as complete.
     var isCompleted: Bool {
         !workouts.isEmpty && workouts.allSatisfy(\.isCompleted)
     }
 
-    /// Today is current and later days are incoming. Earlier days are completed
-    /// only if every workout was ticked, otherwise missed.
+    /// Today is current and anything later is incoming. Past days only count as
+    /// completed if every workout was ticked, otherwise they're missed.
     var status: ProgramStatus {
         if Calendar.current.isDateInToday(date) { return .current }
         if date > Date() { return .incoming }

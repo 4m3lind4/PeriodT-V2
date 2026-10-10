@@ -2,7 +2,8 @@
 //  TestSupport.swift
 //  PeriodT-V2Tests
 //
-//  Shared builders and a spy repository for the unit tests.
+//  Shared bits for the unit tests: fixed dates, builders for sample data and a
+//  spy repository that records every call and can be told to fail.
 //
 
 import Foundation
@@ -112,7 +113,7 @@ final class SpyRepository: IPeriodTRepository {
 
 // MARK: - Async waiting
 
-/// Polls `condition` until it is true or `timeout` passes. Returns the final result.
+/// Keeps checking `condition` until it's true or `timeout` runs out, then returns the result.
 @MainActor
 func waitUntil(timeout: Duration = .seconds(2), _ condition: () -> Bool) async -> Bool {
     let clock = ContinuousClock()

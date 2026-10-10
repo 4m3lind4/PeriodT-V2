@@ -4,13 +4,14 @@
 //
 //  Created by Jessica Amelinda Mang on 10/10/2026.
 //
+//  Passes the tab from a tapped notification over to the UI.
+//
 
 import Combine
 import Foundation
 
-/// Hands the tab from a tapped notification to the UI. The app delegate can
-/// receive the tap before any view exists, so the tab waits here until
-/// `ContentView` picks it up.
+/// The app delegate can get the tap before any view exists (e.g. on a cold launch),
+/// so the tab waits here until `ContentView` is ready to pick it up.
 final class NotificationRouter: ObservableObject {
     static let shared = NotificationRouter()
 

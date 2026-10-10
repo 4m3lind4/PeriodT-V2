@@ -1,19 +1,20 @@
 //
 //  WeekSelectorViewModel.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 14/9/2026.
+//
+//  Builds the Monday to Sunday week strip at the top of Home.
 //
 
 import Foundation
 
-/// Supplies the current week's days (Monday–Sunday) for the home week strip.
 struct WeekSelectorViewModel {
     let currentDate = Date()
     
     private let fullMonthFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM" // "MMMM" outputs the full name (e.g., September)
+        formatter.dateFormat = "MMMM" // full month name, e.g. September
         formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter
     }()

@@ -1,13 +1,15 @@
 //
 //  ProgressSection.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 13/9/2026.
+//
+//  The "My Progress" section on Home.
 //
 
 import SwiftUI
 
-/// "My Progress" section showing a single hard-coded goal and its progress bar.
+/// Just one hard-coded goal for now.
 struct ProgressSection: View {
     var body: some View {
         VStack(alignment: .leading){

@@ -4,6 +4,8 @@
 //
 //  Created by Jessica Amelinda Mang on 4/10/2026.
 //
+//  A small rounded exercise photo, with an icon while it loads or if there isn't one.
+//
 
 import SwiftUI
 

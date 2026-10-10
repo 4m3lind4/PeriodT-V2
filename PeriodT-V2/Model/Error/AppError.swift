@@ -4,16 +4,19 @@
 //
 //  Created by Jessica Amelinda Mang on 8/10/2026.
 //
+//  Every error the user can actually see, along with the wording for the error card.
+//
+
 import Foundation
 
-/// Every error the app can show the user, with the copy for the error card.
-/// Kept as an enum so the wording lives in one place and can be unit tested.
+/// I kept these as an enum so all the wording lives in one place and the unit tests
+/// can check it without having to render anything.
 enum AppError: Hashable {
     /// The user tapped a calendar day that hasn't happened yet.
     case futureDay(Date)
     /// Saving to Supabase failed for the given piece of content.
     case saveFailed(SaveTarget)
-    /// The on-disk store couldn't be opened; the app is running in memory.
+    /// Data couldn't be loaded, so nothing logged this session will be kept.
     case dataUnavailable
 
     /// What the user was trying to save, for the error copy.
@@ -45,8 +48,8 @@ enum AppError: Hashable {
         }
     }
 
-    /// Transient errors slide away on their own after a few seconds.
-    /// A missing data store is permanent for the session, so it stays until dismissed.
+    /// Quick errors slide away by themselves after a few seconds. Losing the data
+    /// store lasts the whole session, so that one stays up until it's dismissed.
     var autoDismisses: Bool {
         switch self {
         case .futureDay, .saveFailed: true

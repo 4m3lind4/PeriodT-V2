@@ -4,11 +4,15 @@
 //
 //  Created by Jessica Amelinda Mang on 10/10/2026.
 //
+//  Decides which reminders the athlete should get and when: phase changes, period
+//  due/overdue, the evening check-in and training days. It's deliberately pure
+//  logic with no UserNotifications import, so the whole plan can be unit tested.
+//  NotificationScheduler is the bit that actually hands it to iOS.
+//
 
 import Foundation
 
-/// One pop-up we want iOS to show. Plain data, so the plan can be unit tested
-/// without touching `UNUserNotificationCenter`.
+/// One pop-up we want iOS to show. Kept as plain data so tests can check it.
 struct PlannedNotification: Equatable {
     enum Kind: String, CaseIterable {
         case phaseChange = "phase"
@@ -23,15 +27,15 @@ struct PlannedNotification: Equatable {
     let title: String
     let body: String
 
-    /// Every identifier we schedule starts with this, so we only ever clear our own.
+    /// Everything we schedule starts with this, so we only ever clear our own.
     static let identifierPrefix = "periodt."
 
-    /// One per kind per day, so rescheduling replaces a notification instead of duplicating it.
+    /// One per kind per day, so rescheduling replaces a notification rather than doubling up.
     var identifier: String {
         "\(Self.identifierPrefix)\(kind.rawValue).\(Self.dayFormatter.string(from: fireDate))"
     }
 
-    /// The tab a tap on this notification opens.
+    /// Which tab to open when this notification is tapped.
     var tab: AppNavigationViewModel.Tab {
         switch self.kind {
         case .phaseChange, .periodDueSoon, .periodOverdue: .calendar
@@ -49,16 +53,15 @@ struct PlannedNotification: Equatable {
     }()
 }
 
-/// Works out every notification to schedule from the user's reviews and programs.
-/// iOS keeps at most 64 pending notifications per app, so we plan a few weeks
-/// ahead and rebuild the plan whenever the data changes.
+/// iOS only keeps 64 pending notifications per app, so rather than scheduling
+/// everything forever I plan a few weeks ahead and rebuild whenever the data changes.
 struct NotificationPlanner {
     var cycleLength = 28
     /// How far ahead to plan phase, period and workout notifications.
     var horizonDays = 35
     /// How many evenings of check-in reminders to plan.
     var checkInDays = 14
-    /// Stays under iOS's limit of 64, keeping the soonest.
+    /// Stays under the limit of 64, keeping whichever are soonest.
     var maxPending = 60
 
     static let phaseHour = 9
@@ -70,6 +73,8 @@ struct NotificationPlanner {
     /// "Log your period" goes out this many days after the predicted start.
     static let overdueAfterDays = 3
 
+    /// Builds every kind, throws away anything already in the past, then keeps the
+    /// soonest `maxPending`. `now` can be passed in so tests can pin the date.
     func plan(reviews: [PollAnswers], programs: [ExerciseProgram], now: Date = Date()) -> [PlannedNotification] {
         let today = now.startOfDay
         let all = phaseChanges(reviews: reviews, from: today)
@@ -84,7 +89,8 @@ struct NotificationPlanner {
 
     // MARK: - Each kind
 
-    /// A notification on the first day of each predicted phase.
+    /// A notification on the first day of each predicted phase. Each day is compared to
+    /// the day before, and we only notify when the phase actually changes.
     private func phaseChanges(reviews: [PollAnswers], from today: Date) -> [PlannedNotification] {
         (0...horizonDays).compactMap { offset in
             let day = Self.day(offset, after: today)
@@ -98,7 +104,7 @@ struct NotificationPlanner {
         }
     }
 
-    /// "Due soon" before the predicted period, and "log it" if it's a few days late.
+    /// "Due soon" just before the predicted period, and "log it" if it's a few days late.
     private func periodReminders(reviews: [PollAnswers]) -> [PlannedNotification] {
         let due = PeriodDueViewModel(cycleLength: cycleLength)
         guard let last = due.lastPeriodStart(in: reviews) else { return [] }
@@ -129,7 +135,8 @@ struct NotificationPlanner {
         }
     }
 
-    /// A morning reminder on each day with a program that isn't finished.
+    /// A morning reminder on each day with an unfinished program. Programs are grouped
+    /// by day so two on the same day give one notification, not two.
     private func workouts(programs: [ExerciseProgram], from today: Date) -> [PlannedNotification] {
         let end = Self.day(horizonDays + 1, after: today)
         let open = programs.filter { program in
@@ -161,9 +168,9 @@ struct NotificationPlanner {
 }
 
 extension NotificationPlanner {
-    /// Only the parts of the data the plan depends on. Rescheduling when this
-    /// changes (rather than on every edit) means typing a journal entry doesn't
-    /// rebuild every notification on each keystroke.
+    /// Just the bits of data the plan actually depends on. ContentView watches this
+    /// rather than the whole store, so typing in the journal doesn't rebuild every
+    /// notification on each keystroke.
     struct Inputs: Hashable {
         let periodDays: Set<Date>
         let checkedInDays: Set<Date>
@@ -181,7 +188,7 @@ extension NotificationPlanner {
 }
 
 extension PollAnswers {
-    /// Whether the user has filled in anything for this day.
+    /// Whether the athlete has filled in anything at all for this day.
     var hasCheckedIn: Bool {
         !answers.isEmpty || emotion != nil || intensity != nil || !journal.isEmpty
     }

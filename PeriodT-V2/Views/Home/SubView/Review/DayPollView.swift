@@ -1,14 +1,16 @@
 //
 //  DayPollView.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 14/9/2026.
+//
+//  The daily check-in itself: yes/no questions, mood, intensity and journal for
+//  one day. It's used on Home for today and in the calendar's day sheet for past
+//  days, so both always read and write the same data through TrackingStore.
 //
 
 import SwiftUI
 
-/// The stack of poll question cards for a single day, reading and
-/// writing that day's answers through the shared `TrackingStore`.
 struct DayPollView: View {
     @EnvironmentObject private var store: TrackingStore
     @Environment(\.presentError) private var presentError
@@ -21,7 +23,8 @@ struct DayPollView: View {
     var body: some View {
         VStack(spacing: 12) {
             ForEach(viewModel.questions) { question in
-                // Each card reads/writes the day's review in the store.
+                // Every control is bound straight to the store rather than local @State,
+                // so there's no copy of the answers to fall out of sync.
                 QuestionCardView(
                     selectedAnswer: Binding(
                         get: { record?.answer(for: question) },
@@ -44,7 +47,7 @@ struct DayPollView: View {
                 selectedIntensity: Binding(
                     get: { record?.intensity ?? IntensitySliderView.defaultIntensity },
                     set: { newValue in
-                        // The slider fires on every drag sample; skip no-op writes.
+                        // The slider fires on every tiny drag movement, so skip it if nothing changed.
                         guard newValue != record?.intensity else { return }
                         update(.pollAnswer) { $0.intensity = newValue }
                     }
@@ -59,8 +62,8 @@ struct DayPollView: View {
         }
     }
 
-    /// Applies `mutate` to the day's review (creating it on first use) and
-    /// raises the error card if the Supabase save fails.
+    /// Applies the change to this day's review (making one if needed) and pops up
+    /// the error card if saving to Supabase fails.
     private func update(_ target: AppError.SaveTarget, _ mutate: (inout PollAnswers) -> Void) {
         store.update(day, onFailure: { presentError(.saveFailed(target)) }, mutate)
     }

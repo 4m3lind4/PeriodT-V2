@@ -4,10 +4,13 @@
 //
 //  Created by Jessica Amelinda Mang on 8/10/2026.
 //
+//  The "Great Job!" screen after submitting a program. The athlete can rate how
+//  hard it was, write a workout journal and choose to let their coach know,
+//  then the confetti plays and they're sent back to Home.
+//
 
 import SwiftUI
 
-/// "Great Job" screen shown after a program is submitted.
 struct ProgramCompletedView: View {
     let program: ExerciseProgram
 

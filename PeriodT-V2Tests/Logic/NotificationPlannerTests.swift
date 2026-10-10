@@ -2,6 +2,9 @@
 //  NotificationPlannerTests.swift
 //  PeriodT-V2Tests
 //
+//  Tests the notification plan. Because the planner is pure logic, these can
+//  check every reminder without going near UNUserNotificationCenter.
+//
 
 import Foundation
 import Testing

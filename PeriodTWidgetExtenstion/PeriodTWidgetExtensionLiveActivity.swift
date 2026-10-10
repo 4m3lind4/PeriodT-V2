@@ -4,11 +4,17 @@
 //
 //  Created by Jessica Amelinda Mang on 10/10/2026.
 //
+//  What the workout Live Activity looks like on the Lock Screen and in the
+//  Dynamic Island. The app side that starts and updates it is
+//  WorkoutLiveActivityController.
+//
 
 import ActivityKit
 import WidgetKit
 import SwiftUI
 
+/// The Lock Screen shows the full card, and the Dynamic Island shows the logo and
+/// how far through the program they are.
 struct WorkoutLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: WorkoutActivityAttributes.self) { context in
@@ -28,6 +34,7 @@ struct WorkoutLiveActivity: Widget {
                     .padding(.top, 4)
             }
             .padding()
+            .environment(\.colorScheme, .light)
             .activityBackgroundTint(Color(white: 0.88))
             .activitySystemActionForegroundColor(.black)
         } dynamicIsland: { context in
@@ -78,6 +85,7 @@ private struct PeriodTLogo: View {
     }
 }
 
+/// A dot per exercise joined by a line, filled in up to the current one.
 struct ProgressDots: View {
     let current: Int
     let total: Int

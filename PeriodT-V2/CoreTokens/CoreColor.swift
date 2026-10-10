@@ -4,12 +4,13 @@
 //
 //  Created by Jessica Amelinda Mang on 4/10/2026.
 //
-
+//  The PeriodT colour palette. Every view pulls its colours from here rather than
+//  hard-coding hex values, so if the brand colours ever change it's a one-file job.
+//
 
 import Foundation
 import SwiftUI
 
-/// App colour palette. Use these instead of hard-coded hex values in views.
 public final class CoreColor {
     
     // MARK: Primary Brand Colours
@@ -32,16 +33,16 @@ public final class CoreColor {
     
     static var yellow: Color = Color(hex: "#FAD72C")
     
-    // MARK: Active Colours
-    static let completed      = Color(hex: "#F08054") // Completed
+    // MARK: Program Status Colours
+    static let completed      = Color(hex: "#F08054")
 
-    static let missed         = Color(hex: "#B9AAB2") // Missed (past, not finished)
+    static let missed         = Color(hex: "#B9AAB2") // in the past and not finished
     
-    static let current        = Color(hex: "#DB6E96") // Current
+    static let current        = Color(hex: "#DB6E96") // today
     
-    static let incoming       = Color(hex: "#AB7AC7") // Incoming
+    static let incoming       = Color(hex: "#AB7AC7") // coming up
     
-    static let physioAccent   = Color(hex: "#FAD94A") // Physio
+    static let physioAccent   = Color(hex: "#FAD94A")
     
     static let cardBackground = Color(hex: "#FCEBF0") // light pink
 

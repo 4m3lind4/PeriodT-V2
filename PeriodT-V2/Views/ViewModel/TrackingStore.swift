@@ -4,6 +4,11 @@
 //
 //  Created by Jessica Amelinda Mang on 9/10/2026.
 //
+//  The single source of truth for the athlete's daily check-ins. Home, the
+//  calendar and the day sheet all read from here, so editing a day in one place
+//  shows up everywhere straight away. Edits apply locally first and save to
+//  Supabase in the background, which keeps the UI feeling instant.
+//
 
 import Foundation
 import SwiftUI
@@ -11,9 +16,6 @@ import Combine
 import OSLog
 import WidgetKit
 
-/// App-wide cache of the user's daily reviews, backed by Supabase.
-/// Home, the calendar and the day sheet all read from here, so an edit in
-/// one place shows up everywhere straight away.
 @MainActor
 final class TrackingStore: ObservableObject {
     private static let logger = Logger(subsystem: "PeriodT", category: "TrackingStore")
@@ -22,19 +24,19 @@ final class TrackingStore: ObservableObject {
     @Published private(set) var reviews: [Date: PollAnswers] = [:] {
         didSet { syncPeriodWidget() }
     }
-    /// Days with a program that has at least one ticked workout (calendar dots).
+    /// Days with at least one ticked workout, for the dots on the calendar.
     @Published private(set) var completedProgramDays: Set<Date> = []
-    /// Every program the user can see, for showing a day's workout in the calendar sheet.
+    /// Every program the athlete can see, so the calendar sheet can show a day's workout.
     @Published private(set) var programs: [ExerciseProgram] = []
 
     private let repository: IPeriodTRepository
-    /// One pending save per day; a new edit restarts that day's wait.
-    /// A day stays here until its save finishes, so `load()` knows not to overwrite it.
+    /// One pending save per day, and a new edit restarts that day's wait. A day stays
+    /// in here until its save finishes, so `load()` knows not to overwrite it.
     private var pendingSaves: [Date: Task<Void, Never>] = [:]
-    /// Which edit owns each day's pending save, so an older save finishing late
-    /// doesn't clear the entry for a newer one.
+    /// Which edit owns each day's save, so an older save finishing late doesn't
+    /// clear out the entry for a newer one.
     private var pendingSaveIDs: [Date: UUID] = [:]
-    /// Wait before saving, so typing and slider drags send one request, not dozens.
+    /// How long to wait before saving, so typing or dragging a slider sends one request instead of dozens.
     private let saveDelay: Duration
 
     init(repository: IPeriodTRepository, saveDelay: Duration = .milliseconds(600)) {
@@ -52,9 +54,9 @@ final class TrackingStore: ObservableObject {
         programs.filter { Calendar.current.isDate($0.date, inSameDayAs: day) }
     }
 
-    /// Fetches reviews and program completions. Failures are logged and leave
-    /// the current values in place. Days with an edit that hasn't saved yet keep
-    /// the local copy, since the server's is older.
+    /// Pulls down reviews and program completions. If either fails it's logged and
+    /// whatever we already had stays put. Days with an unsaved edit keep the local
+    /// copy, since the server's version is older.
     func load() async {
         do {
             let fetched = try await repository.fetchPollAnswers()
@@ -77,8 +79,9 @@ final class TrackingStore: ObservableObject {
         }
     }
 
-    /// Applies `mutate` locally right away, then saves to Supabase after a short pause.
-    /// `onFailure` runs if that save fails.
+    /// Applies the change locally straight away, then saves to Supabase after a short
+    /// pause. This debounce is what lets the check-in feel instant while still only
+    /// sending one request per burst of edits. `onFailure` runs if the save fails.
     func update(_ day: Date,
                 onFailure: @escaping () -> Void,
                 _ mutate: (inout PollAnswers) -> Void) {
@@ -92,16 +95,16 @@ final class TrackingStore: ObservableObject {
         pendingSaveIDs[key] = saveID
         pendingSaves[key] = Task { [repository, saveDelay] in
             try? await Task.sleep(for: saveDelay)
-            // A newer edit replaced this save and will clear the entry itself.
+            // A newer edit took over this save and will clean up after itself.
             guard !Task.isCancelled else { return }
             defer { self.finishSave(for: key, id: saveID) }
             do {
-                // Save whatever is latest by now, not the snapshot from this edit.
+                // Save whatever's latest by now, not the snapshot from when this edit happened.
                 if let latest = self.reviews[key] {
                     try await repository.savePollAnswers(latest)
                 }
             } catch {
-                // Cancelled mid-request by a newer edit, whose own save will follow.
+                // Cancelled mid-request by a newer edit, which will do its own save.
                 guard !Task.isCancelled else { return }
                 Self.logger.error("Failed to save review for \(key): \(error.localizedDescription)")
                 onFailure()
@@ -115,7 +118,7 @@ final class TrackingStore: ObservableObject {
         pendingSaves[key] = nil
     }
 
-    /// Hands the latest period start to the home-screen widget so its countdown stays current.
+    /// Hands the latest period start to the widget so its countdown stays up to date.
     private func syncPeriodWidget() {
         let periodDue = PeriodDueViewModel()
         let changed = PeriodCountdownStore.save(lastPeriod: periodDue.lastPeriodStart(in: allReviews),
@@ -128,8 +131,8 @@ final class TrackingStore: ObservableObject {
 
 // MARK: - Previews
 
-/// Gives a preview a `TrackingStore` filled from `MockPeriodTRepository`.
-/// The store only fills once `load()` runs, which the app does in `ContentView`.
+/// Gives a preview a `TrackingStore` filled from `MockPeriodTRepository`. In the real
+/// app `ContentView` calls `load()`, so previews need to do it themselves.
 private struct PreviewTrackingStore: ViewModifier {
     @StateObject private var store = TrackingStore(repository: MockPeriodTRepository())
 

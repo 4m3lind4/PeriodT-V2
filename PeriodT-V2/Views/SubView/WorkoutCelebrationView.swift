@@ -4,12 +4,13 @@
 //
 //  Created by Jessica Amelinda Mang on 8/10/2026.
 //
+//  The full-screen confetti after a workout is logged.
+//
 
 import SwiftUI
 
-/// Full-screen confetti overlay shown after the post-workout quiz is submitted.
-/// Uses the pink brand background so the confetti (lavender / pale pink / orange)
-/// reads on-brand, then hands control back via `onFinished`.
+/// Sits on the pink brand background so the confetti colours match, then calls
+/// `onFinished` once the animation's done.
 struct WorkoutCelebrationView: View {
     var onFinished: () -> Void
 

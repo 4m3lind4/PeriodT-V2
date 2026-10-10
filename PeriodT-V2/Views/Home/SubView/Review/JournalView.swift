@@ -1,8 +1,10 @@
 //
 //  JournalView.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 14/9/2026.
+//
+//  The emotional journal box at the bottom of the daily check-in.
 //
 
 import SwiftUI

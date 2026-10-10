@@ -4,6 +4,8 @@
 //
 //  Created by Jessica Amelinda Mang on 1/10/2026.
 //
+//  Takes a launch screenshot for each configuration.
+//
 
 import XCTest
 

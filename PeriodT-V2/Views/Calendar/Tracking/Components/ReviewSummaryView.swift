@@ -4,18 +4,20 @@
 //
 //  Created by Jessica Amelinda Mang on 10/10/2026.
 //
+//  A read-only summary of a logged day, shown in the calendar's day sheet and
+//  the journal entry sheet. Only things the athlete actually filled in get a card.
+//
 
 import SwiftUI
 
-/// Read-only cards for a logged day review: a purple label strip over a pale answer.
-/// Shows the first few, with View More to reveal the rest.
+/// Shows the first couple of cards, with View More for the rest.
 struct ReviewSummaryView: View {
     let review: PollAnswers
 
     @State private var showAll = false
     private let previewCount = 2
 
-    /// One card per thing the user actually filled in, in the same order as the form.
+    /// One card for each thing the athlete filled in, in the same order as the form.
     private var items: [SummaryItem] {
         var items: [SummaryItem] = []
         for kind in PollQuestionKind.allCases {
@@ -33,7 +35,7 @@ struct ReviewSummaryView: View {
         if !journal.isEmpty {
             items.append(SummaryItem(title: "Emotion Journal", value: journal))
         }
-        // One card per program journal; numbered when a day has more than one.
+        // One card per workout journal, numbered if there's more than one that day.
         let workoutJournals = review.workoutJournals.values
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
@@ -104,7 +106,7 @@ struct ReviewSummaryView: View {
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
-    /// Words for the 0...4 slider, matching its VERY UNPLEASANT ... VERY PLEASANT ends.
+    /// Words for the 0 to 4 slider value, matching the labels on each end of it.
     private static func intensityLabel(_ value: Int) -> String {
         switch value {
         case ...0: "Very unpleasant"

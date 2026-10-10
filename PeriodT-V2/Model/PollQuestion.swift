@@ -1,13 +1,17 @@
 //
 //  PollQuestion.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 14/9/2026.
 //
+//  The daily check-in questions. The kind is what gets saved, the struct is
+//  just what the card needs to draw itself.
+//
+
 import Foundation
 import SwiftUI
 
-/// Stable identifier for each poll question. The raw string is what gets persisted.
+/// The raw string is what's saved, so don't rename these once they're in use.
 enum PollQuestionKind: String, Codable, CaseIterable {
     case trained
     case onPeriod
@@ -25,7 +29,7 @@ struct PollQuestion: Identifiable {
 }
 
 extension PollQuestionKind {
-    /// Compact heading used on the calendar's review summary.
+    /// Shorter wording for the calendar's review summary.
     var summaryTitle: String {
         switch self {
         case .trained: "Did you practice today?"

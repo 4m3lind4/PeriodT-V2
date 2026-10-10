@@ -4,13 +4,7 @@
 //
 //  Created by Jessica Amelinda Mang on 4/10/2026.
 //
-
-
-//
-//  ExerciseType.swift
-//  PeriodT
-//
-//  Created by Jessica Amelinda Mang on 14/9/2026.
+//  The two kinds of program: physio and conditioning.
 //
 
 import Foundation

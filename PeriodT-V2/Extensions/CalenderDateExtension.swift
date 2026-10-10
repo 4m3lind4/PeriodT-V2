@@ -4,17 +4,13 @@
 //
 //  Created by Jessica Amelinda Mang on 4/10/2026.
 //
+//  Date maths for the month grid on the Calendar tab. The grid always starts on a
+//  Monday, so most of this is about padding the first row with the tail end of the
+//  previous month.
+//
 
-
-//
-//  DateFormatter.swift
-//  PeriodT
-//
-//  Created by Jessica Amelinda Mang on 13/9/2026.
-//
 import Foundation
 
-/// Date helpers used to build the calendar grid.
 extension Date {
     
     /// Single-letter weekday headers, Monday first ("M", "T", "W" ...).
@@ -31,6 +27,7 @@ extension Date {
         }
     }
     
+    /// Month names in the user's language, January first.
     static var fullMonthNames: [String] {
         
         let dateFormatter = DateFormatter()
@@ -38,14 +35,15 @@ extension Date {
         
         return (1...12).compactMap { month in
             dateFormatter.setLocalizedDateFormatFromTemplate("MMMM")
-            let date = Calendar.current.date(from: DateComponents(year: 2000, month: month, day: 1)) //Create a date with the given month name
+            let date = Calendar.current.date(from: DateComponents(year: 2000, month: month, day: 1)) // any day in the month will do, we only want its name
             
             return date.map {dateFormatter.string(from: $0)}
         }
     }
     
-    // `Calendar` returns optionals for every arithmetic call; these fall back to
-    // `self` rather than crashing, which at worst mis-lays-out one month.
+    // `Calendar` hands back an optional for every bit of maths. Rather than force
+    // unwrapping, these fall back to today's date, so the worst case is one month
+    // drawn a bit wrong instead of a crash.
     var StartOfMonth: Date {
         Calendar.current.dateInterval(of: .month, for: self)?.start ?? startOfDay
     }
@@ -73,8 +71,8 @@ extension Date {
         return Calendar.current.date(byAdding: .day, value: -daysSinceMonday, to: StartOfMonth) ?? StartOfMonth
     }
     
-    /// Every day to show for this month's grid: the month itself plus the
-    /// trailing days of the previous month needed to pad the first row to Monday.
+    /// Every day shown in this month's grid. That's the month itself, plus however
+    /// many days from the end of last month it takes to fill the first row back to Monday.
     var calendarDisplayDays: [Date] {
         
         let thisMonth = (0..<numberOfDaysInMonth).compactMap { dayOffset in

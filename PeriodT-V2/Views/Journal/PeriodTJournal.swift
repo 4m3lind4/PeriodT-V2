@@ -4,15 +4,17 @@
 //
 //  Created by Jessica Amelinda Mang on 9/10/2026.
 //
+//  The Journal tab. The athlete's goals up top, then every journal entry
+//  newest first. Entries are pulled out of the daily reviews in TrackingStore
+//  rather than stored separately, so there's only one copy of each journal.
+//
 
 import SwiftUI
 
-/// Journal tab: the user's goals, then their journal entries newest first.
-/// Each day can have two entries: Home's emotional journal and the workout journal.
 struct PeriodTJournal: View {
     @EnvironmentObject private var store: TrackingStore
 
-    /// Goals aren't stored anywhere yet, so they only last until the app quits.
+    /// Goals aren't saved anywhere yet, so they only last until the app quits.
     @State private var goals: [JournalGoal] = JournalGoal.samples
     @State private var expandedGoalID: JournalGoal.ID?
     @State private var showAllGoals = false
@@ -22,10 +24,10 @@ struct PeriodTJournal: View {
     @State private var newGoalText = ""
     @State private var openEntry: JournalEntry?
 
-    /// Items shown per section before "View More".
+    /// How many items each section shows before "View More".
     private let previewCount = 2
 
-    /// Every non-empty journal, most recent first; workout entries before emotional on the same day.
+    /// Every non-empty journal, newest first. On the same day workout entries come first.
     private var entries: [JournalEntry] {
         let all: [JournalEntry] = store.allReviews.flatMap(entries(in:))
         return all.sorted { lhs, rhs in
@@ -90,7 +92,7 @@ struct PeriodTJournal: View {
             }
             .padding(16)
         }
-        // Keeps the last card clear of the tab bar.
+        // Stops the last card hiding behind the tab bar.
         .contentMargins(.bottom, 100, for: .scrollContent)
         .background(Color.white.ignoresSafeArea())
         .sheet(item: $openEntry) { entry in
@@ -144,7 +146,7 @@ struct JournalGoal: Identifiable, Hashable {
     ]
 }
 
-/// "GOAL n" card; tapping it reveals the full goal text.
+/// "GOAL n" card. Tapping it shows the full goal.
 private struct GoalCard: View {
     let goal: JournalGoal
     let number: Int
@@ -188,7 +190,7 @@ struct JournalEntry: Identifiable {
     let type: JournalType
     let text: String
     var emotion: Emotion?
-    /// Set for workout entries: which program the journal belongs to.
+    /// Only set for workout entries, it's which program the journal is about.
     var programID: UUID?
     var programTitle: String?
 
@@ -205,7 +207,6 @@ private struct JournalEntryCard: View {
                 Text("\(entry.date.formatted(.dateTime.day())) of \(entry.date.formatted(.dateTime.month(.wide)))")
                     .font(.system(size: 20, design: .rounded))
                 Spacer()
-                // Pink for workout journals, orange for emotional ones.
                 tag(entry.type.title, color: entry.type.color)
             }
             .foregroundStyle(CoreColor.primary)

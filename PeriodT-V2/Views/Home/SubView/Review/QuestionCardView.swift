@@ -1,15 +1,16 @@
 //
 //  QuestionCardView.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 13/9/2026.
+//
+//  A single yes/no question card for the daily check-in.
 //
 
 import SwiftUI
 
 
-/// Coloured question banner with a Yes / No button row underneath.
-/// The chosen answer is highlighted and written back through the binding.
+/// The picked answer is highlighted and written back through the binding.
 
 struct QuestionCardView: View {
     @Binding var selectedAnswer: ReviewAnswer?
@@ -22,7 +23,7 @@ struct QuestionCardView: View {
                 .font(.system(size: 22))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)   // never truncate
+                .fixedSize(horizontal: false, vertical: true)   // wrap rather than cut off long questions
                 .padding(.vertical, 40)
                 .padding(.horizontal, 24)
                 .frame(maxWidth: .infinity)

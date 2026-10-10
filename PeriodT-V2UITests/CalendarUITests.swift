@@ -2,6 +2,9 @@
 //  CalendarUITests.swift
 //  PeriodT-V2UITests
 //
+//  UI tests for the Calendar tab: the countdown, day sheet, future-day error
+//  and editing a past day's check-in.
+//
 
 import XCTest
 
@@ -62,7 +65,7 @@ final class CalendarUITests: PeriodTUITestCase {
         XCTAssertTrue(app.staticTexts["Did you practice today?"].exists)
         XCTAssertTrue(app.buttons["Edit review"].exists)
 
-        // Two summary cards show until View More.
+        // Only two summary cards show until View More is tapped.
         let viewMore = app.buttons["View More"]
         XCTAssertTrue(viewMore.exists)
         XCTAssertFalse(app.staticTexts["Emotions"].exists)
@@ -81,7 +84,7 @@ final class CalendarUITests: PeriodTUITestCase {
         let error = anyElement(containing: "not available yet")
         XCTAssertTrue(error.waitForExistence(timeout: timeout))
         XCTAssertFalse(app.staticTexts["My Programs"].exists, "Future days shouldn't open the sheet")
-        // Transient errors slide away after ~3 seconds.
+        // Quick errors slide away by themselves after about 3 seconds.
         XCTAssertTrue(waitForNonExistence(error, timeout: 8))
     }
 

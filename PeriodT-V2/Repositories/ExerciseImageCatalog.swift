@@ -4,10 +4,12 @@
 //
 //  Created by Jessica Amelinda Mang on 4/10/2026.
 //
+//  Matches exercise names to photos using the bundled `ExerciseImages.csv`, so
+//  the coach only has to type a name and the thumbnail turns up on its own.
+//
 
 import Foundation
 
-/// Looks up a photo for an exercise name using `ExerciseImages.csv
 enum ExerciseImageCatalog {
 
     private static let imageURLs: [String: URL] = loadCatalog()
@@ -24,8 +26,8 @@ enum ExerciseImageCatalog {
         }
 
         var catalog: [String: URL] = [:]
-        // Skip the header row
-        // go through line by line separating by comma and extract url for each exercise
+        // Skip the header row, then split each line into name and URL. If a name
+        // turns up twice the first one wins.
         for line in contents.split(whereSeparator: \.isNewline).dropFirst() {
             let columns = line.split(separator: ",", maxSplits: 1, omittingEmptySubsequences: false)
             guard columns.count == 2,
@@ -40,7 +42,8 @@ enum ExerciseImageCatalog {
         return catalog
     }
 
-    /// "Farmer's Walk" → "farmerswalk", "Goblet squats" → "gobletsquat".
+    /// Normalises names so small differences in how the coach types them still match,
+    /// e.g. "Farmer's Walk" → "farmerswalk" and "Goblet squats" → "gobletsquat".
     private static func key(for name: String) -> String {
         var key = name.lowercased().filter { $0.isLetter || $0.isNumber }
         if key.hasSuffix("s") {

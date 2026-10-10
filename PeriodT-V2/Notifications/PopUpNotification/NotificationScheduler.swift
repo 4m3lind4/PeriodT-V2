@@ -4,13 +4,15 @@
 //
 //  Created by Jessica Amelinda Mang on 10/10/2026.
 //
+//  Takes the plan from NotificationPlanner and turns it into real pending iOS
+//  notifications, clearing out any of ours that aren't needed anymore.
+//
 
 import Foundation
 import OSLog
 import UserNotifications
 
-/// Turns `NotificationPlanner`'s plan into pending iOS notifications.
-/// Safe to call as often as needed: stable identifiers mean each run
+/// Fine to call as often as you like. The identifiers are stable, so each run
 /// replaces the last one rather than adding duplicates.
 final class NotificationScheduler {
 
@@ -18,7 +20,7 @@ final class NotificationScheduler {
 
     private static let logger = Logger(subsystem: "PeriodT", category: "Notifications")
 
-    /// Key in `userInfo` holding the `AppNavigationViewModel.Tab` raw value to open on tap.
+    /// The `userInfo` key holding which tab to open on tap.
     static let tabKey = "tab"
 
     var planner = NotificationPlanner()
@@ -30,8 +32,8 @@ final class NotificationScheduler {
         let center = UNUserNotificationCenter.current()
         let planned = planner.plan(reviews: reviews, programs: programs)
 
-        // Drop anything of ours that's no longer in the plan (e.g. a check-in
-        // the user has now done, or phases that moved after logging a period).
+        // Clear out anything of ours that's no longer in the plan, like a check-in
+        // they've now done or phases that shifted after logging a period.
         let wanted = Set(planned.map(\.identifier))
         let stale = await center.pendingNotificationRequests()
             .map(\.identifier)

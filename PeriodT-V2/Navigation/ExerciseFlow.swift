@@ -4,10 +4,11 @@
 //
 //  Created by Jessica Amelinda Mang on 8/10/2026.
 //
+//  Destinations that get pushed onto the exercise NavigationStack.
+//
 
 import Foundation
 
-/// Steps in the post-program flow that are pushed onto the exercise stack.
 enum ExerciseFlow: Hashable {
     /// The "Great Job" screen for the program that was just submitted.
     case completed(ExerciseProgram)

@@ -4,62 +4,56 @@
 //
 //  Created by Jessica Amelinda Mang on 5/10/2026.
 //
-
-
-//
-//  PeriodTExercises.swift
-//  PeriodT
-//
-//  Created by Jessica Amelinda Mang on 11/9/2026.
+//  The Exercise tab. Programs are grouped into today, incoming, missed and
+//  completed, and this view owns the NavigationStack for the whole workout flow
+//  (program, then sets, then the completed screen).
 //
 
 import SwiftUI
 import Lottie
 
-/// Exercise tab: lists programs grouped into today, incoming, missed and completed,
-/// with one card expandable at a time. Physio programs are marked on the card itself.
 struct PeriodTExercises: View {
     let repository: IPeriodTRepository
     @EnvironmentObject private var navigation: AppNavigationViewModel
     @State var exerciseData: [ExerciseProgram] = []
     @State private var errorMessage: String?
-    /// False until the first fetch finishes; drives the loading animation.
+    /// False until the first fetch finishes, which is when the loading animation goes away.
     @State private var hasLoaded = false
 
-    // Only one card is open at once; shared across all sections.
+    // Only one card can be open at once, across every section.
     @State private var expandedProgramID: ExerciseProgram.ID?
     @State private var showAllIncoming = false
     @State private var showAllMissed = false
     @State private var showAllCompleted = false
 
-    /// Cards shown per section before "View More".
+    /// How many cards each section shows before "View More".
     private let previewCount = 2
 
     var todaysPrograms: [ExerciseProgram] {
         exerciseData.filter { $0.status == .current }
     }
-    /// Soonest first (data arrives sorted by date ascending).
+    /// Soonest first, since the data already comes back sorted by date.
     var incomingPrograms: [ExerciseProgram] {
         exerciseData.filter { $0.status == .incoming }
     }
-    /// Past programs with workouts left unticked. Most recent first.
+    /// Past programs with workouts left unticked, most recent first.
     var missedPrograms: [ExerciseProgram] {
         exerciseData.filter { $0.status == .missed }.reversed()
     }
-    /// Past programs with every workout ticked. Most recent first.
+    /// Past programs with every workout ticked, most recent first.
     var completedPrograms: [ExerciseProgram] {
         exerciseData.filter { $0.status == .completed }.reversed()
     }
 
     var body: some View {
-        // Bound to the shared path so deeper screens can push/pop by editing it.
+        // Bound to the shared path so screens further in can push or pop by editing it.
         NavigationStack(path: $navigation.exercisePath) {
             programList
-                // "Start" on a card pushes the program it was showing.
+                // "Start" on a card opens that program.
                 .navigationDestination(for: ExerciseProgram.self) { program in
                     ActiveInProgramView(program: program, repository: repository)
                 }
-                // Pushed by ActiveInProgramView after a successful submit.
+                // ActiveInProgramView pushes this after a successful submit.
                 .navigationDestination(for: ExerciseFlow.self) { step in
                     switch step {
                     case .completed(let program):
@@ -74,7 +68,7 @@ struct PeriodTExercises: View {
             VStack(alignment: .leading, spacing: 12) {
                 ScreenHeader(title: "Today's Program")
 
-                // A failed first load would otherwise look like an empty schedule.
+                // Without this a failed first load would just look like an empty schedule.
                 if errorMessage != nil && exerciseData.isEmpty {
                     Text("Couldn't load your programs. Pull down to try again.")
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
@@ -93,9 +87,9 @@ struct PeriodTExercises: View {
             }
             .padding(16)
         }
-        // Keeps the last card clear of the floating tab bar.
+        // Stops the last card hiding behind the tab bar.
         .contentMargins(.bottom, 100, for: .scrollContent)
-        // Only on the very first fetch, so pull-to-refresh doesn't flash it.
+        // Only for the very first fetch, so pull-to-refresh doesn't flash it up again.
         .overlay {
             if !hasLoaded {
                 ZStack {
@@ -108,13 +102,13 @@ struct PeriodTExercises: View {
         }
         .task { await load() }
         .refreshable { await load() }
-        // Back on the list after a submit: refetch so saved ticks are reflected.
+        // Back on the list after a submit, so refetch to pick up the saved ticks.
         .onChange(of: navigation.exercisePath.isEmpty) { _, isEmpty in
             if isEmpty { Task { await load() } }
         }
     }
 
-    /// Section heading, the first few cards, and a View More / View Less toggle.
+    /// A section heading, the first few cards and a View More / View Less button.
     @ViewBuilder
     private func programSection(title: String,
                                 programs: [ExerciseProgram],

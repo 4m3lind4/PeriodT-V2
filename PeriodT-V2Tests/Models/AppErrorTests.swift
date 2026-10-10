@@ -2,6 +2,8 @@
 //  AppErrorTests.swift
 //  PeriodT-V2Tests
 //
+//  Checks the wording on each error card.
+//
 
 import Foundation
 import Testing

@@ -4,26 +4,19 @@
 //
 //  Created by Jessica Amelinda Mang on 5/10/2026.
 //
-
-
-//
-//  PrimaryButton.swift
-//  PeriodT
-//
-//  Created by Jessica Amelinda Mang on 14/9/2026.
+//  The rounded button style used for Submit, Start and Save across the app.
 //
 
 import SwiftUI
 
-/// Rounded call-to-action label (Submit / Start / Save), sized to match the Journal entry Save.
-/// Wrap it in a `Button` or `NavigationLink` to make it tappable.
+/// Only the label, so wrap it in a `Button` or `NavigationLink` to make it tappable.
 struct PrimaryButtonLabel: View {
     enum Style {
-        /// Pink text on a pale background - for use on coloured screens.
+        /// Pink text on a pale background, for coloured screens.
         case light
-        /// White text on a pink background - for use on white screens.
+        /// White text on a pink background, for white screens.
         case filled
-        /// Light pink text on a pink background - a softer `filled`.
+        /// Light pink text on pink, a softer version of `filled`.
         case filledSoft
     }
 

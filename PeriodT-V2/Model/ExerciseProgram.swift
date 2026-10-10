@@ -4,19 +4,13 @@
 //
 //  Created by Jessica Amelinda Mang on 4/10/2026.
 //
-
-
-//
-//  ExerciseProgram.swift
-//  PeriodT
-//
-//  Created by Jessica Amelinda Mang on 14/9/2026.
+//  A training session the coach has set (physio or conditioning) and its list of
+//  workouts. This maps straight onto the `exercise_programs` table in Supabase.
 //
 
 import Foundation
 import SwiftUI
 
-/// A single scheduled workout session assigned by the coach.
 struct ExerciseProgram: Identifiable, Hashable, Codable {
     var id = UUID()
     let date: Date
@@ -26,7 +20,7 @@ struct ExerciseProgram: Identifiable, Hashable, Codable {
     let exerciseType: ExerciseType
     let workouts: [Workout]
 
-    /// Maps Swift property names to the snake_case columns in Supabase.
+    /// Supabase columns are snake_case, Swift is camelCase.
     enum CodingKeys: String, CodingKey {
         case id, date, day, workouts
         case exerciseDuration = "exercise_duration"
@@ -45,7 +39,7 @@ struct ExerciseProgram: Identifiable, Hashable, Codable {
     }()
     
     
-    /// Day-of-month as an Int (e.g. 14 for the 14th).
+    /// The day of the month as a number, e.g. 14 for the 14th.
     func dateNumber(date: Date) -> Int {
         Int(Self.dateNumberFormatter.string(from: date)) ?? 0
         

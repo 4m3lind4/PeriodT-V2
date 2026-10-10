@@ -1,15 +1,17 @@
 //
 //  IntensitySliderView.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 14/9/2026.
+//
+//  The "how pleasant did today feel" slider in the daily check-in.
 //
 
 import SwiftUI
 
-/// Five-step "how pleasant" slider, from very unpleasant (0) to very pleasant (4).
+/// Goes from very unpleasant (0) to very pleasant (4).
 struct IntensitySliderView: View {
-    /// Middle of the track, shown until the user picks a value.
+    /// The middle of the track, shown until the athlete picks something.
     static let defaultIntensity = 2
 
     @Binding var selectedIntensity: Int

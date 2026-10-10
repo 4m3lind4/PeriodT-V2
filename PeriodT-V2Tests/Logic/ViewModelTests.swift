@@ -2,7 +2,7 @@
 //  ViewModelTests.swift
 //  PeriodT-V2Tests
 //
-//  CalendarViewModel, WeekSelectorViewModel and AppNavigationViewModel.
+//  Tests CalendarViewModel, WeekSelectorViewModel and AppNavigationViewModel.
 //
 
 import Foundation

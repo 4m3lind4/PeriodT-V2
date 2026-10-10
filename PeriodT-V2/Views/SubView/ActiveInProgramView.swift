@@ -4,13 +4,15 @@
 //
 //  Created by Jessica Amelinda Mang on 8/10/2026.
 //
+//  The screen an athlete works through during a program. Each exercise is a
+//  card with a progress line down the side that fills in as they go. Ticks are
+//  kept locally while they train and only saved to Supabase on Submit, and the
+//  Live Activity is kept in step so the Lock Screen shows the current exercise.
+//
 
 import SwiftUI
 import OSLog
 
-/// In-progress program: one card per exercise, with a progress line down the left.
-/// Tapping a card opens its set tracker; finishing every set fills that circle and
-/// extends the line to the next exercise.
 struct ActiveInProgramView: View {
     private static let logger = Logger(subsystem: "PeriodT", category: "ActiveInProgramView")
 
@@ -18,15 +20,16 @@ struct ActiveInProgramView: View {
     let repository: IPeriodTRepository
     @EnvironmentObject private var navigation: AppNavigationViewModel
     @Environment(\.presentError) private var presentError
-    /// Which sets have been ticked, per workout. Only the finished workouts are saved
-    /// to Supabase on Submit, so this resets if the user leaves mid-program.
+    /// Which sets are ticked for each workout. Only finished workouts get saved on
+    /// Submit, so this resets if the athlete leaves halfway through.
     @State private var completedSets: [Workout.ID: Set<Int>]
-    /// The workout whose set tracker is open.
+    /// Which workout's sets are open.
     @State private var openWorkoutID: Workout.ID?
     @State private var isSaving = false
     @State private var liveActivity = WorkoutLiveActivityController()
-    /// How deep the exercise stack was when this screen showed, so leaving can tell
-    /// a back-out (stack shrank) from pushing a workout or switching tabs.
+    /// How deep the exercise stack was when this screen appeared. When it disappears
+    /// we compare against this to tell backing out (stack got shorter) apart from
+    /// opening a workout or switching tabs.
     @State private var stackDepth = 0
 
     init(program: ExerciseProgram, repository: IPeriodTRepository) {
@@ -42,12 +45,12 @@ struct ActiveInProgramView: View {
 
     private var title: String { "\(program.formattedDate) Program" }
 
-    /// Workouts with every set ticked; this is what gets saved.
+    /// Workouts with every set ticked, which is what gets saved.
     private var completedWorkoutIDs: Set<Workout.ID> {
         Set(program.workouts.filter(isFinished).map(\.id))
     }
 
-    /// First exercise that isn't finished yet; the last one once everything is done.
+    /// The first unfinished exercise, or the last one once everything's done.
     private var currentWorkoutIndex: Int {
         program.workouts.firstIndex { !isFinished($0) } ?? max(program.workouts.count - 1, 0)
     }
@@ -67,8 +70,8 @@ struct ActiveInProgramView: View {
                         workoutRow(workout, at: index)
                     }
 
-                    // Save, then push the "Great Job" screen. On failure the
-                    // user stays here with an error card so they can retry.
+                    // Save first, then move on to the "Great Job" screen. If it fails they
+                    // stay here with an error card and their ticks intact so they can retry.
                     Button {
                         Task {
                             if await submitProgram() {
@@ -81,7 +84,7 @@ struct ActiveInProgramView: View {
                     } label: {
                         PrimaryButtonLabel(title: isSaving ? "Saving..." : "Submit")
                     }
-                    // Stops a double tap sending the save twice.
+                    // Stops a double tap saving twice.
                     .disabled(isSaving)
                     .padding(.top, 24)
                 }
@@ -89,7 +92,7 @@ struct ActiveInProgramView: View {
                 .padding(.trailing, 20)
                 .padding(.vertical, 12)
             }
-            // Keeps Submit clear of the floating tab bar on long programs.
+            // Stops Submit hiding behind the tab bar on long programs.
             .contentMargins(.bottom, 100, for: .scrollContent)
             .background(CoreColor.primary)
             .ignoresSafeArea(edges: .bottom)
@@ -99,12 +102,12 @@ struct ActiveInProgramView: View {
                 WorkoutSetsView(title: title, workout: workout, completedSets: setsBinding(for: id))
             }
         }
-        // Mirror progress onto the lock screen while the program is open.
+        // Show progress on the Lock Screen while the program is open.
         .onAppear {
             stackDepth = navigation.exercisePath.count
             liveActivity.show(program: program, currentIndex: currentWorkoutIndex)
         }
-        // Backed out without submitting: don't leave the program on the lock screen.
+        // If they back out without submitting, don't leave it sitting on the Lock Screen.
         .onDisappear {
             if navigation.exercisePath.count < stackDepth {
                 liveActivity.end()
@@ -115,8 +118,8 @@ struct ActiveInProgramView: View {
         }
     }
 
-    /// Timeline column plus the tappable card. The vertical padding lives inside the row
-    /// so the line segments meet the next row's with no gap.
+    /// The progress line plus the card. The vertical padding sits inside the row so
+    /// each bit of line meets the next row's with no gap.
     private func workoutRow(_ workout: Workout, at index: Int) -> some View {
         Button {
             openWorkoutID = workout.id
@@ -128,9 +131,9 @@ struct ActiveInProgramView: View {
         .padding(.vertical, 10)
         .background(alignment: .leading) {
             Timeline(
-                // Line comes in from above when the previous exercise is done...
+                // The line comes in from above once the previous exercise is done,
                 lineAbove: index > 0 && isFinished(program.workouts[index - 1]),
-                // ...and leaves downwards once this one is done, pointing at the next.
+                // and carries on down once this one's done, pointing at the next.
                 lineBelow: index < program.workouts.count - 1 && isFinished(workout),
                 isFilled: isFinished(workout)
             )
@@ -145,8 +148,8 @@ struct ActiveInProgramView: View {
         )
     }
 
-    /// Saves the ticked workouts to Supabase. Returns false if the save failed,
-    /// leaving the ticks in place so the user can retry.
+    /// Saves the ticked workouts. Returns false if it failed, and the ticks stay put
+    /// so the athlete can try again.
     private func submitProgram() async -> Bool {
         isSaving = true
         defer { isSaving = false }
@@ -162,7 +165,7 @@ struct ActiveInProgramView: View {
 
 #Preview {
     NavigationStack {
-        // Fake program so the preview doesn't need Supabase.
+        // A made-up program so the preview doesn't need Supabase.
         ActiveInProgramView(program: ExerciseProgram(
             date: .now,
             day: 1,
@@ -181,7 +184,7 @@ struct ActiveInProgramView: View {
     .environmentObject(AppNavigationViewModel())
 }
 
-/// One row's slice of the progress line: a circle with optional line halves above and below.
+/// One row's piece of the progress line: a circle, with a bit of line above and below when needed.
 private struct Timeline: View {
     static let columnWidth: CGFloat = 46
     private let circleSize: CGFloat = 28

@@ -2,7 +2,8 @@
 //  MockPeriodTRepositoryTests.swift
 //  PeriodT-V2Tests
 //
-//  The mock backs previews and the UI tests, so its behaviour needs to match the real repository's contract.
+//  The mock repository backs the previews and UI tests, so these make sure it
+//  behaves the same way as the real one.
 //
 
 import Foundation

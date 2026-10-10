@@ -1,8 +1,12 @@
 //
-//  IPeriodTReposity.swift
+//  IPeriodTRepository.swift
 //  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 4/10/2026.
+//
+//  The contract for everything that reads or writes data. Views and view models
+//  only ever talk to this protocol, never Supabase directly, which is what lets
+//  previews and UI tests swap in `MockPeriodTRepository` without changing any UI code.
 //
 
 import Foundation

@@ -4,11 +4,12 @@
 //
 //  Created by Jessica Amelinda Mang on 8/10/2026.
 //
+//  The "how hard was it" slider on the completed-program screen.
+//
 
 import SwiftUI
 
-/// Five-step "how hard was it" slider (0 = too hard, 4 = too easy).
-/// Styled for the pink completed-program screen.
+/// 0 is too hard and 4 is too easy. Coloured for the pink background.
 struct PostWorkoutIntensity: View {
     @State var selectedIntensity: Int = 2
 

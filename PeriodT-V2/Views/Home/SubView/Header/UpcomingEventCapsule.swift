@@ -1,8 +1,10 @@
 //
 //  UpcomingEventCapsule.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 12/9/2026.
+//
+//  The orange banner on Home counting down to the athlete's next big event.
 //
 
 import SwiftUI

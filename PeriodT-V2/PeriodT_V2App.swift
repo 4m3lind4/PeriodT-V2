@@ -4,12 +4,16 @@
 //
 //  Created by Jessica Amelinda Mang on 1/10/2026.
 //
+//  App entry point. This is where the repository gets picked (Supabase normally,
+//  the mock one for UI tests) and handed down to everything else, so no view ever
+//  creates its own database connection.
+//
 
 import SwiftUI
 import UserNotifications
 
-/// Lets notifications show as banners even when the app is open,
-/// and opens the matching tab when one is tapped.
+/// Lets notifications show as banners even while the app is open, and opens
+/// the matching tab when one is tapped.
 final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
@@ -39,7 +43,7 @@ struct PeriodT_V2App: App {
     private let repository: IPeriodTRepository
 
 
-    // Created once for the app's lifetime; @StateObject stops it being rebuilt on redraw.
+    // @StateObject so these are made once and survive every redraw.
     @StateObject private var navigation = AppNavigationViewModel()
     @StateObject private var store: TrackingStore
 
@@ -49,8 +53,8 @@ struct PeriodT_V2App: App {
         _store = StateObject(wrappedValue: TrackingStore(repository: repository))
     }
 
-    /// UI tests launch with `-UITesting` to run against `MockPeriodTRepository` instead of Supabase,
-    /// and add `-UITestingOffline` to make every repository call fail.
+    /// UI tests launch with `-UITesting` to use `MockPeriodTRepository` instead of Supabase,
+    /// and add `-UITestingOffline` to make every call fail so the error states can be tested.
     private static func makeRepository() -> IPeriodTRepository {
         #if DEBUG
         let arguments = ProcessInfo.processInfo.arguments
@@ -64,7 +68,7 @@ struct PeriodT_V2App: App {
     var body: some Scene {
         WindowGroup {
             ContentView(repository: repository)
-                // App-wide errors sit above the tab bar.
+                // App-wide errors show above the tab bar.
                 .errorCardHost()
                 .environmentObject(navigation)
                 .environmentObject(store)

@@ -4,11 +4,13 @@
 //
 //  Created by Jessica Amelinda Mang on 5/10/2026.
 //
+//  An in-memory stand-in for Supabase. Used by SwiftUI previews, the unit tests
+//  and the UI tests (launched with `-UITesting`), so none of them need a network.
+//
 
 import Foundation
 
-/// In-memory sample data for previews and for running without Supabase.
-/// Programs added with `addProgram` are kept until the app quits.
+/// Anything added is kept in memory until the app quits.
 final class MockPeriodTRepository: IPeriodTRepository {
 
     private var programs: [ExerciseProgram]
@@ -36,7 +38,7 @@ final class MockPeriodTRepository: IPeriodTRepository {
         return programs.sorted { $0.date < $1.date }
     }
 
-    /// Adding the same program twice (a retry) keeps one copy, like the real repository.
+    /// Adding the same program twice (e.g. a retry) keeps one copy, same as the real repository.
     func addProgram(_ program: ExerciseProgram) async throws {
         try await simulateNetwork()
         guard !programs.contains(where: { $0.id == program.id }) else { return }
@@ -84,8 +86,8 @@ final class MockPeriodTRepository: IPeriodTRepository {
 // MARK: - Sample Data
 
 extension MockPeriodTRepository {
-    /// Dates are relative to today, so there's always a mix of past (lavender) and upcoming (pink) programs.
-    /// Workout names match `ExerciseImages.csv`, so thumbnails show up.
+    /// Dates are relative to today so there's always a mix of past and upcoming programs.
+    /// The workout names match `ExerciseImages.csv` so the thumbnails show up.
     static let samplePrograms: [ExerciseProgram] = [
         sampleProgram(daysFromToday: -5, day: 0, duration: 35, type: .conditioningTraining, workouts: [
             ("Goblet Squat", 3),
@@ -126,8 +128,8 @@ extension MockPeriodTRepository {
         ])
     ]
 
-    /// Period logged from 5 to 2 days ago, plus a few non-period days, so the calendar
-    /// shows a joined pill. "Period Due" counts from the period's first day, so it reads 23 Days.
+    /// A period logged from 5 to 2 days ago plus a few normal days, so the calendar shows
+    /// a joined-up pill. "Period Due" counts from the first day, so it should read 23 Days.
     static let samplePollAnswers: [PollAnswers] = [
         sampleReview(daysFromToday: -6, trained: .yes, onPeriod: .no, emotion: .happy, intensity: 4,
                      journal: "Felt strong on the squats today."),

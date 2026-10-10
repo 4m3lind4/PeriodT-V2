@@ -1,13 +1,14 @@
 //
-//  QuickQuestionaireView.swift
-//  PeriodT
+//  HomeQuestionaireView.swift
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 13/9/2026.
+//
+//  The "Review" section on Home, which is just today's check-in with a heading.
 //
 
 import SwiftUI
 
-/// "Review" section on Home - the daily poll for today.
 struct HomeQuestionaireView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {

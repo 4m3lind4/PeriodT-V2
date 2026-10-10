@@ -2,7 +2,8 @@
 //  EnumAndConstantTests.swift
 //  PeriodT-V2Tests
 //
-//  Small value types whose raw values are persisted or shown to the user.
+//  Tests the small enums whose raw values get saved or shown to the user, so a
+//  rename doesn't quietly break saved data.
 //
 
 import Foundation

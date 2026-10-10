@@ -1,14 +1,16 @@
 //
 //  ChartView.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 13/9/2026.
 //
+//  Line chart comparing how emotionally intense the week feels in two phases.
+//  It's still sample data for now, the plan is to build it from real check-ins.
+//
+
 import SwiftUI
 import Charts
 
-/// Line chart comparing emotional level across the week for two phases.
-/// Data is static sample data for now.
 struct ChartView: View {
     let data: [EmotionalLevel] = [
         EmotionalLevel(day: "Mon", menstrualLevel: 10, lutealLevel: 20),
@@ -22,7 +24,7 @@ struct ChartView: View {
 
     var body: some View {
         Chart(data) { item in
-            // One line per phase; colour is mapped via chartForegroundStyleScale below.
+            // One line per phase. The colours get mapped in chartForegroundStyleScale below.
             LineMark(
                 x: .value("Day", item.day),
                 y: .value(

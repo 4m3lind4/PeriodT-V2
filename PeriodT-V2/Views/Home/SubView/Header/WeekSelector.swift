@@ -1,13 +1,14 @@
 //
 //  WeekSelector.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 14/9/2026.
+//
+//  The Monday to Sunday strip at the top of Home, with today highlighted.
 //
 
 import SwiftUI
 
-/// Monday–Sunday strip for the current week with today highlighted.
 struct WeekSelector: View {
     
     var weekSelectorViewModel = WeekSelectorViewModel()
@@ -33,7 +34,7 @@ struct WeekSelector: View {
                 )
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 18)
-                // Filled pill behind today's date only.
+                // Only today gets the filled pill behind it.
                 .background(
                     Group {
                         if weekSelectorViewModel.currentDateNumber == item.date {

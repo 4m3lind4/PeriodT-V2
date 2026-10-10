@@ -1,14 +1,16 @@
 //
 //  DayDetailSheet.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 14/9/2026.
+//
+//  The sheet that opens when a calendar day is tapped. It starts on an overview
+//  of the day (phase, programs and the logged check-in) and the pencil swaps it
+//  to the same check-in form as Home, so athletes can fill in days they missed.
 //
 
 import SwiftUI
 
-/// Sheet shown when a calendar day is tapped. Opens on an overview of that day
-/// (cycle phase, workout, logged review); the pencil switches to the review form.
 struct DayDetailSheet: View {
     let day: Date
 
@@ -35,11 +37,11 @@ struct DayDetailSheet: View {
             .padding(.top, 8)
         }
         .scrollIndicators(.hidden)
-        // Sheets sit above the calendar's host, so errors need their own.
+        // Sheets sit above the calendar's error host, so this needs its own.
         .errorCardHost()
         .presentationDetents([.fraction(0.8), .large])
         .presentationDragIndicator(.visible)
-        // White like the design, so the pale pink cards stand out.
+        // White like the design so the pale pink cards stand out.
         .presentationBackground(Color.white.opacity(0.95))
     }
 
@@ -48,7 +50,7 @@ struct DayDetailSheet: View {
     private var overview: some View {
         VStack(alignment: .leading, spacing: 16) {
             VStack(spacing: 6) {
-                // "Friday 7 of September"
+                // e.g. "Friday 7 of September"
                 Text("\(day.formatted(.dateTime.weekday(.wide))) \(day.formatted(.dateTime.day())) of \(day.formatted(.dateTime.month(.wide)))")
                     .font(.system(size: 26, weight: .bold, design: .rounded))
                     .foregroundStyle(CoreColor.primary)
@@ -93,7 +95,7 @@ struct DayDetailSheet: View {
                 Button {
                     withAnimation(.snappy) { isEditing = true }
                 } label: {
-                    // Plus when nothing is logged yet, pencil to edit an existing review.
+                    // Plus if nothing's logged yet, pencil if there's a review to edit.
                     Image(systemName: review == nil ? "plus" : "pencil")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundStyle(CoreColor.primary)
@@ -129,8 +131,8 @@ struct DayDetailSheet: View {
 
     // MARK: - Editor
 
-    /// The same form as Home's Review. Answers save as they change, so Submit
-    /// just returns to the overview.
+    /// The same form as Home's check-in. Answers save as they change, so Submit
+    /// just flips back to the overview.
     private var editor: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(day, format: .dateTime.weekday(.wide).day().month(.wide))

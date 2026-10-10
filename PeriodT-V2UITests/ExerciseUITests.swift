@@ -2,6 +2,9 @@
 //  ExerciseUITests.swift
 //  PeriodT-V2UITests
 //
+//  UI tests for the whole workout flow, from opening a program through ticking
+//  sets, submitting and landing back on Home.
+//
 
 import XCTest
 

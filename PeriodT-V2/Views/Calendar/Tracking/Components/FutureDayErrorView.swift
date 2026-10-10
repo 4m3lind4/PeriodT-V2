@@ -1,14 +1,15 @@
 //
 //  FutureDayErrorView.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 14/9/2026.
+//
+//  The error card for tapping a day that hasn't happened yet.
 //
 
 import SwiftUI
 
-/// Pink error card shown when the user taps a day that hasn't happened yet.
-/// Thin wrapper over the shared `ErrorCardView`.
+/// Just a thin wrapper around the shared `ErrorCardView`.
 struct FutureDayErrorView: View {
     let day: Date
     let onDismiss: () -> Void

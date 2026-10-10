@@ -1,20 +1,22 @@
 //
 //  PeriodTHome.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 11/9/2026.
+//
+//  The Home tab. It's mostly a stack of sections (week strip, cycle ring,
+//  forecast, today's programs, progress and the daily check-in), each in its own
+//  file so this one just lays them out.
 //
 
 import SwiftUI
 
-/// Home tab: greeting, week strip, cycle ring, forecast chart,
-/// program carousel, goal progress and the daily review poll.
 struct PeriodTHome: View {
     @EnvironmentObject private var store: TrackingStore
 
     private let viewModel = WeekSelectorViewModel()
 
-    /// Scroll target for Submit to jump back to.
+    /// Where Submit scrolls back to.
     private let topID = "home-top"
 
     var body: some View {
@@ -24,7 +26,6 @@ struct PeriodTHome: View {
                 greetingHeader
                     .padding(.horizontal,10)
                     .id(topID)
-// MARK: ------ COMPLIATION OF ITEMS
 
                 WeekSelector()
                 Spacer()
@@ -40,8 +41,8 @@ struct PeriodTHome: View {
                 Spacer()
                 HomeQuestionaireView()
 
-                // Answers already save as they're picked; Submit just confirms
-                // and takes the user back up to the top of Home.
+                // Answers already save as they're picked, so Submit doesn't actually save
+                // anything. It just gives a sense of being done and scrolls back to the top.
                 Button {
                     withAnimation(.easeInOut) {
                         proxy.scrollTo(topID, anchor: .top)
@@ -54,7 +55,7 @@ struct PeriodTHome: View {
             }
             .padding(10)
         }
-        // Keeps Submit clear of the floating tab bar.
+        // Stops Submit hiding behind the floating tab bar.
         .contentMargins(.bottom, 100, for: .scrollContent)
         }
     }

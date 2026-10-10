@@ -4,11 +4,13 @@
 //
 //  Created by Jessica Amelinda Mang on 8/10/2026.
 //
+//  The workout journal on the completed-program screen. Each program gets its
+//  own entry, kept separate from the emotional journal on Home.
+//
 
 import SwiftUI
 
-/// Journal styled for the pink completed-program screen. Each program keeps its
-/// own entry (on the program's day), separate from Home's emotional journal.
+/// Saved against the program's day, keyed by the program's id.
 struct WorkoutJournalView: View {
     @EnvironmentObject private var store: TrackingStore
     @Environment(\.presentError) private var presentError

@@ -4,12 +4,15 @@
 //
 //  Created by Jessica Amelinda Mang on 10/10/2026.
 //
+//  The "Entries" sheet for writing or editing a day's journal. The tag menu
+//  switches between the emotional journal and the workout journal, and the day's
+//  check-in can be reviewed or edited further down.
+//
 
 import SwiftUI
 
-/// "Entries" sheet opened from the Journal page. The tag dropdown picks which of
-/// the day's journals the text box edits: Emotional, or the Workout journal of
-/// one program (`programID`, else the day's first program).
+/// A workout journal belongs to one program. That's `programID` if it's given,
+/// otherwise the first program on that day.
 struct JournalEntrySheet: View {
     let day: Date
     private let programID: UUID?
@@ -30,10 +33,10 @@ struct JournalEntrySheet: View {
 
     private var review: PollAnswers? { store.review(for: day) }
 
-    /// The program whose workout journal this sheet edits.
+    /// Which program's workout journal this sheet is editing.
     private var workoutProgramID: UUID? { programID ?? store.programs(on: day).first?.id }
 
-    /// Workout journals belong to a program, so there's nothing to save without one.
+    /// Workout journals need a program, so there's nothing to save if the day doesn't have one.
     private var canSave: Bool { type == .emotional || workoutProgramID != nil }
 
     private func journalText(for type: JournalType) -> String {
@@ -77,7 +80,7 @@ struct JournalEntrySheet: View {
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .onAppear { draft = journalText(for: type) }
-        // Switching tag shows the other journal for this day.
+        // Switching the tag loads the other journal for this day.
         .onChange(of: type) { _, newType in draft = journalText(for: newType) }
     }
 
@@ -92,7 +95,8 @@ struct JournalEntrySheet: View {
             Menu {
                 Picker("Journal type", selection: $type) {
                     ForEach(JournalType.allCases) { option in
-                        // Menus tint SF Symbols with the accent colour, so bake each dot's colour in.
+                        // Menus tint every SF Symbol with the accent colour, so the dot's colour
+                        // has to be baked into the image itself.
                         Label {
                             Text(option.title)
                         } icon: {
@@ -144,6 +148,8 @@ struct JournalEntrySheet: View {
         .shadow(color: .black.opacity(0.25), radius: 4, y: 4)
     }
 
+    /// Copies everything out first so the save uses what was on screen when Save was
+    /// tapped, even if the tag gets switched straight after.
     private func save() {
         isTyping = false
         let text = draft

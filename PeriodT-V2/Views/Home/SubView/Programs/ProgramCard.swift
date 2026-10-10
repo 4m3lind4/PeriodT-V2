@@ -1,21 +1,23 @@
 //
-//  ProgramCards.swift
-//  PeriodT
+//  ProgramCard.swift
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 13/9/2026.
+//
+//  The small program card in Home's carousel, plus the empty state for days
+//  with nothing on.
 //
 
 import SwiftUI
 
 
-/// Compact program card used in the Home horizontal carousel.
-/// Colour band on top shows the program's status, matching the Exercise tab cards.
+/// The colour band on top shows the program's status, same as the Exercise tab cards.
 struct ProgramCard: View {
     let program: ExerciseProgram
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Status band: completed / current / incoming.
+            // Status band (completed, current or incoming).
             program.status.color
                 .frame(height: 20)
 
@@ -35,7 +37,7 @@ struct ProgramCard: View {
     }
 }
 
-/// Shown in place of the carousel when nothing is scheduled.
+/// Shown instead of the carousel when nothing's scheduled.
 struct NoProgramsCard: View {
     var body: some View {
         Text("No Exercises due!\nEnjoy freedom🎉")

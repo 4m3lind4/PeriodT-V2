@@ -2,8 +2,8 @@
 //  OfflineUITests.swift
 //  PeriodT-V2UITests
 //
-//  Every repository call fails (`-UITestingOffline`), so each screen should fall back
-//  to its empty state instead of crashing or hanging.
+//  Every repository call fails here (`-UITestingOffline`), so each screen
+//  should fall back to its empty state instead of crashing or hanging.
 //
 
 import XCTest

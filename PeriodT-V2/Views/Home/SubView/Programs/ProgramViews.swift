@@ -1,13 +1,15 @@
 //
 //  ProgramViews.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 12/9/2026.
+//
+//  The "Today Programs" section on Home.
 //
 
 import SwiftUI
 
-/// "Today Programs" section: heading plus a horizontal scroll of today's program cards.
+/// A heading plus a sideways scroll of today's program cards.
 struct ProgramViews: View {
     let programs: [ExerciseProgram]
 

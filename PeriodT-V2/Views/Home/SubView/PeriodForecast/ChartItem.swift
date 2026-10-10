@@ -1,26 +1,25 @@
 //
 //  ChartItem.swift
-//  PeriodT
+//  PeriodT-V2
 //
 //  Created by Jessica Amelinda Mang on 13/9/2026.
+//
+//  The "Period Forecast" section on Home: a bit of explanation, the mood chart
+//  and a legend for the four phases.
 //
 
 import SwiftUI
 
 
-/// "Period Forecast" section: explanatory text, the emotion line chart,
-/// and a legend of the four cycle phases.
 struct ChartItem: View {
     
     var body: some View {
-        //HEADING
         VStack(alignment: .leading, spacing: 1){
             Text("Period Forecast")
                 .font(Font.system(size: 30, weight: .bold, design: .rounded))
                 .foregroundColor(CoreColor.primary)
                 .padding(.horizontal, 12)
 
-            //FIRST BODY OF TECT
             VStack(alignment: .center, spacing: 12) {
                 Text("By being in the luteal phase you should expect to feeling emotionally intense in practice due to PMS.")
                     .multilineTextAlignment(.center)
@@ -49,7 +48,7 @@ struct ChartItem: View {
         }
     }
 
-    /// One chip per cycle phase, coloured to match the chart.
+    /// One chip per phase, coloured to match the chart.
     private var phaseLegend: some View {
         HStack {
             PhaseLegendChip(title: "Menstruation", color: CoreColor.primary)

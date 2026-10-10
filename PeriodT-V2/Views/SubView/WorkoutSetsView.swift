@@ -4,16 +4,17 @@
 //
 //  Created by Jessica Amelinda Mang on 10/10/2026.
 //
+//  A single exercise opened from the program list: a big photo, the sets and
+//  rest, and a row per set to tick off. Once the last set is ticked it heads back
+//  to the list by itself so the athlete doesn't have to.
+//
 
 import SwiftUI
 
-/// One exercise opened from the in-progress list: a large photo, its prescription,
-/// and one row per set that the user taps as they finish it.
-/// When the last set is ticked it returns to the list, where the progress line moves on.
 struct WorkoutSetsView: View {
     let title: String
     let workout: Workout
-    /// Indexes (0-based) of the sets ticked so far. Owned by ActiveInProgramView.
+    /// Which sets are ticked so far (counting from 0). ActiveInProgramView owns this.
     @Binding var completedSets: Set<Int>
 
     @Environment(\.dismiss) private var dismiss
@@ -45,14 +46,14 @@ struct WorkoutSetsView: View {
                 .padding(.horizontal, 20)
                 .padding(.vertical, 20)
             }
-            // Keeps the last set clear of the floating tab bar.
+            // Stops the last set hiding behind the tab bar.
             .contentMargins(.bottom, 100, for: .scrollContent)
             .background(CoreColor.primary)
             .ignoresSafeArea(edges: .bottom)
         }
     }
 
-    /// "3 Sets of 10 Second Rest", leaving out whichever part isn't set.
+    /// e.g. "3 Sets | 10 Second Rest", leaving out whichever part is missing.
     private var prescription: String? {
         let parts = [
             workout.sets.map { "\($0) Sets" },
@@ -61,7 +62,7 @@ struct WorkoutSetsView: View {
         return parts.isEmpty ? nil : parts.joined(separator: " | ")
     }
 
-    /// The frame is sized first and the photo fills it, so a wide photo can't widen the page.
+    /// The frame gets sized first and the photo fills it, so a wide photo can't stretch the page.
     private var heroImage: some View {
         Color.clear
             .frame(maxWidth: .infinity)
@@ -104,7 +105,7 @@ struct WorkoutSetsView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    /// The whole row is the tap target so it's easy to hit mid-workout.
+    /// The whole row is tappable so it's easy to hit mid-workout.
     private func setRow(_ index: Int) -> some View {
         let isDone = completedSets.contains(index)
 
@@ -115,7 +116,7 @@ struct WorkoutSetsView: View {
                 Image(systemName: "play.circle")
                     .font(.system(size: 34, weight: .regular))
 
-                // Reps for this set; untracked work just shows the set number.
+                // Show the reps, or just the set number if reps aren't tracked.
                 Text(workout.reps.map(String.init) ?? "Set \(index + 1)")
                     .font(.system(size: 17, weight: .bold, design: .rounded))
 
@@ -149,7 +150,8 @@ struct WorkoutSetsView: View {
                 completedSets.insert(index)
             }
         }
-        // Last set done: pause so the tick is visible, then head back to the list.
+        // Last set done: wait half a second so they see the tick, then go back to the list.
+        // It checks again after the wait in case they unticked it in the meantime.
         if isFinished {
             Task {
                 try? await Task.sleep(for: .milliseconds(500))

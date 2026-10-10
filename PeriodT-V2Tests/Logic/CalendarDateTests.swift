@@ -2,7 +2,7 @@
 //  CalendarDateTests.swift
 //  PeriodT-V2Tests
 //
-//  The Monday-first month grid and other Date helpers.
+//  Tests the Date helpers behind the Monday-first month grid.
 //
 
 import Foundation
